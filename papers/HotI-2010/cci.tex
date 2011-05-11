@@ -4,6 +4,9 @@
 
 \usepackage{url}
 
+\usepackage{color}
+\usepackage{xcolor}
+
 % correct bad hyphenation here
 \hyphenation{op-tical net-works semi-conduc-tor Myri-com}
 
@@ -33,6 +36,8 @@ The abstract goes here.
 % For peerreview papers, this IEEEtran command inserts a page break and
 % creates the second title. It will be ignored for other modes.
 \IEEEpeerreviewmaketitle
+
+\newcommand{\note}[1]{\colorbox{yellow!50}{\small Note: #1}}
 
 \section{Introduction}
 Introduction text goes here.
@@ -66,6 +71,39 @@ Both sends and receives are buffered allowing operations to complete quickly (if
 space is available for sends or data exists in the buffer for receives). Applications may
 also choose to not block if need be. The downside of buffering is more work is required by
 the CPU which can result in lower throughput over the network.
+
+\subsection{MPI} In the high performance computing (HPC) arena, MPI is the dominant
+interface for inter-process communication. Designed for maximum scalability, MPI has a
+richer, but more complicated API.
+
+It provides point-to-point (i.e. send-recv or two-sided semantics), collective, and
+one-sided operations. For point-to-point communication, MPI provides a variety of modes
+including blocking and non-blocking, synchronous and asynchronous, as well as \emph{ready}
+mode (only send if a matching receive has been posted).
+
+Multiple implementations exist\cite{OMPI, MPICH2, MVAPICH, IBM-MPI, Intel-MPI, Cray-MPI}
+which support multiple operating systems.  Rather than connections, the API uses the
+notion of communication groups (i.e.  communicators) which include all processes
+(MPI\_COMM\_WORLD) and may be split to include subsets of processes. MPI does provide a
+notion of dynamic process management which includes MPI\_Comm\_accept and
+MPI\_Comm\_connect, but this is less mature and much less used.
+
+The MPI standard does not define an underlying network protocol and each MPI
+implementation has written its own network abstraction layer (NAL). These NALs typically
+support sockets as well as one or more vendor specific APIs.
+
+MPI is a less mature interface compared to sockets. MPI is more fragile to use than
+sockets. If an application using MPI encounters a communications fault, the application
+typically aborts. Although work has been done on fault-tolerant MPI\cite{FT-MPI, MPI-FT},
+that work has yet to be adopted by the broader HPC community.
+
+The MPI standard does not specify buffering semantics (i.e. when to use eager versus
+rendezvous mode). It has limited support for one-sided operations due to the lack of
+memory registration.\note{Patrick, can you elaborate?}
+
+\subsection{Vendor APIs} Mellanox Verbs, Cray/Sandia Portals, Qlogic PSM, Myricom MX, LBL
+Gasnet, etc. A lot of choice, but none is perfect and they share: no critical mass (vendor
+fragmentation), more complicated APIs (driven by hardware design).
 
 \section{Goals for CCI}
 Text goes here
