@@ -108,7 +108,7 @@ provide a lot of choice, but none is perfect (i.e. none have convinced they othe
 adopt their API).  Since most are targeted to specific hardware, the APIs tend to be more
 complicated.
 
-Based on the ealier VIA specification\cite{via}, the Infiniband standard does not specify
+Based on the earlier VIA specification\cite{via}, the Infiniband standard does not specify
 an API; it only specifies which \emph{verbs} must be supported. After many vendors created
 separate Verbs APIs, they eventually coalesced into the Open Fabric Association's (OFA)
 Verbs. OFA's Verbs has had the broadest adoption, yet it still represents less than 50\%
@@ -125,10 +125,9 @@ processes establish a queue-pair (QP), which is much more cumbersome than socket
 
 The Portals API provides one-sided semantics (i.e.  Put/Get), uses match tags to steer
 messages to the correct buffers. The API is connection-less and leaves it up to the NAL to
-maintain any necessary connection state internally. Portals is mostly used an the largest
-HPC systems such as ORNL's Jaguar\cite{jaguar} and Sandia's Red Sky\cite{red-sky}. The
-Lustre distributed file system NAL, LNET, was orginally based on
-Portals\cite{lnet}.
+maintain any necessary connection state internally. Portals is mostly used on the large
+Cray systems such as ORNL's Jaguar\cite{jaguar} and Sandia's Red Sky\cite{red-sky}.  The
+Lustre distributed file system NAL, LNET, was originally based on Portals\cite{lnet}.
 
 Both designed for implementing MPI, Myricom's MyrinetExpress (MX) and Qlogic's PathScale
 Messages (PSM) have many similarities. Both provide a two-sided interface which uses
@@ -137,7 +136,26 @@ are connection-less in that the target does not have to accept.  Both provide re
 in-order matching, but out-of-order completion.
 
 \section{Goals for CCI}
-Text goes here
+In setting out to design a new communication's interface, we had several goals in mind:
+portability, simplicity, performance, scalability, and robustness.
+
+\subsection{Portability}
+For any new interface to gain acceptance in the broader (HPC and non-HPC) community, it
+would need to provide the semantics that are common to most vendor interfaces.
+
+\subsection{Simplicity}
+Simple: Socket is the reference.
+
+\subsection{Performance}
+Performance: Async operation (buffered or not), support for zero-copy, support for
+one-sided operations.
+
+\subsection{Scalability}
+Scalability: demultiplexing, shared resources, support NUMA/multicore .
+
+\subsection{Robustness}
+Robustness: connection-oriented semantics, error recovery, support for unreliable
+communications including multicast
 
 \section{The CCI Interface}
 Text goes here
