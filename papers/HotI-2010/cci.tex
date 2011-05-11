@@ -101,16 +101,19 @@ The MPI standard does not specify buffering semantics (i.e. when to use eager ve
 rendezvous mode). It has limited support for one-sided operations due to the lack of
 memory registration.\note{Patrick, can you elaborate?}
 
-\subsection{Vendor APIs} Mellanox Verbs, Cray/Sandia Portals, Qlogic PSM, Myricom MX, LBL
-Gasnet, etc. A lot of choice, but none is perfect and they share: no critical mass (vendor
-fragmentation), more complicated APIs (driven by hardware design).
+\subsection{Vendor APIs} There are numberous vendor- and organization-specific APIs
+including Infiniband's Verbs\cite{verbs}, Cray/Sandia's Portals\cite{portals}, Qlogic's
+PSM\cite{psm}, Myricom's MX\cite{mx}, LBL's Gasnet\cite{gasnet}, and so on.  Overall, they
+provide a lot of choice, but none is perfect (i.e. none have convinced they others to
+adopt their API).  Since most are targeted to specific hardware, the APIs tend to be more
+complicated.
 
 Based on the ealier VIA specification\cite{via}, the Infiniband standard does not specify
-an API; it only specifies which \emph{verbs} must be supported\cite{verbs}. After many
-vendors created separate Verbs APIs, they eventually coalesced into the Open Fabric
-Association's (OFA) Verbs. OFA's Verbs has had the broadest adoption, yet it still represents
-less than 50\% of the machines on the Top 500\cite{top500} with some, but much less,
-adoption outside of HPC.
+an API; it only specifies which \emph{verbs} must be supported. After many vendors created
+separate Verbs APIs, they eventually coalesced into the Open Fabric Association's (OFA)
+Verbs. OFA's Verbs has had the broadest adoption, yet it still represents less than 50\%
+of the machines on the Top 500\cite{top500} with some, but much less, adoption outside of
+HPC.
 
 Verbs has support for (small) two-sided and one-sided operations. All operations are
 asynchronous. Verbs has support for reliable and unreliable modes, connection-oriented
@@ -127,11 +130,11 @@ HPC systems such as ORNL's Jaguar\cite{jaguar} and Sandia's Red Sky\cite{red-sky
 Lustre distributed file system NAL, LNET, was orginally based on
 Portals\cite{lnet}.
 
-Both designed for implementing MPI, Myricom's MyrinetExpress (MX)\cite{mx} and Qlogic's
-PathScale Messages (PSM)\cite{psm} have many similarities. Both provide a two-sided
-interface which uses buffering for smaller messages and remote direct memory access for
-larger messages.  Both are connection-less in that the target does not have to accept.
-Both provide reliable, in-order matching, but out-of-order completion.
+Both designed for implementing MPI, Myricom's MyrinetExpress (MX) and Qlogic's PathScale
+Messages (PSM) have many similarities. Both provide a two-sided interface which uses
+buffering for smaller messages and remote direct memory access for larger messages.  Both
+are connection-less in that the target does not have to accept.  Both provide reliable,
+in-order matching, but out-of-order completion.
 
 \section{Goals for CCI}
 Text goes here
