@@ -81,7 +81,7 @@ one-sided operations. For point-to-point communication, MPI provides a variety o
 including blocking and non-blocking, synchronous and asynchronous, as well as \emph{ready}
 mode (only send if a matching receive has been posted).
 
-Multiple implementations exist\cite{ompi, mpich2, mvapich, ibm-mpi, intel-mpi, cray-mpi}
+Multiple implementations exist\cite{ompi, mpich2, mvapich, intel-mpi, platform-mpi}
 which support multiple operating systems and/or interconnects.  Rather than connections,
 the API uses the notion of communication groups (i.e.  communicators) which include all
 processes (MPI\_COMM\_WORLD) and may be split to include subsets of processes. MPI does
@@ -102,7 +102,7 @@ rendezvous mode). It has limited support for one-sided operations due to the lac
 memory registration.\note{Patrick, can you elaborate?}
 
 \subsection{Vendor APIs} There are numberous vendor- and organization-specific APIs
-including Infiniband's Verbs\cite{verbs}, Cray/Sandia's Portals\cite{portals}, Qlogic's
+including Infiniband's Verbs\cite{ofa-verbs}, Cray/Sandia's Portals\cite{portals}, Qlogic's
 PSM\cite{psm}, Myricom's MX\cite{mx}, LBL's Gasnet\cite{gasnet}, and so on.  Overall, they
 provide a lot of choice, but none is perfect (i.e. none have convinced they others to
 adopt their API).  Since most are targeted to specific hardware, the APIs tend to be more
@@ -118,10 +118,13 @@ HPC.
 Verbs has support for (small) two-sided and one-sided operations. All operations are
 asynchronous. Verbs has support for reliable and unreliable modes, connection-oriented
 and connection-less. Verbs does not support buffering; all receives must be posted before
-sending. Also, all data movement operations require pinning the memory in advance. For
-the most common reliable, connection-oriented communication, Verbs requires that the two
+sending. Also, all data movement operations require pinning the memory in advance. For the
+most common reliable, connection-oriented communication, Verbs requires that the two
 processes establish a queue-pair (QP), which is much more cumbersome than socket's
-\texttt{connect()} and \texttt{accept()}.\note{can someone review this?}
+\texttt{connect()} and \texttt{accept()}. Lastly, requiring QPs between all processes has
+memory scaling issues. Work has been done with shared receive queues (SRQ) in MPI\cite{srq} to
+help increase the scalability of Verb's based systems.\note{can someone review all of
+this?}
 
 The Portals API provides one-sided semantics (i.e.  Put/Get), uses match tags to steer
 messages to the correct buffers. The API is connection-less and leaves it up to the NAL to
@@ -141,17 +144,22 @@ portability, simplicity, performance, scalability, and robustness.
 
 \subsection{Portability}
 For any new interface to gain acceptance in the broader (HPC and non-HPC) community, it
-would need to provide the semantics that are common to most vendor interfaces.
+needs to provide the semantics that are common to most vendor interfaces.
 
 \subsection{Simplicity}
-Simple: Socket is the reference.
+The socket interface is the reference. It is flexible without being overly complicated.
 
 \subsection{Performance}
-Performance: Async operation (buffered or not), support for zero-copy, support for
-one-sided operations.
+Ideally, an API would provide asynchronous operations to allow overlap between computation
+and communication. Buffering may or may not be needed to provide asynchrony. The API would
+provide support for zero-copy, OS-bypass when hardware support is available. Lastly, it
+would provide support for one-sided operations.
 
 \subsection{Scalability}
-Scalability: demultiplexing, shared resources, support NUMA/multicore .
+Projections for exascale systems include 100,000s of nodes and 1,000,000s of
+cores\cite{dongarra:exascale-talk-2010}. To maximize scalability, an API must provide
+demultiplexing\note{Patrick, what do you have in mind here?}, use shared resources as much
+as possible, and support NUMA/multicore systems.
 
 \subsection{Robustness}
 Robustness: connection-oriented semantics, error recovery, support for unreliable
@@ -195,11 +203,51 @@ The authors would like to thank...
 % <OR> manually copy in the resultant .bbl file
 % set second argument of \begin to the number of references
 % (used to reserve space for the reference number labels box)
-\begin{thebibliography}{1}
+\begin{thebibliography}{10}
 
-\bibitem{IEEEhowto:kopka}
-H.~Kopka and P.~W. Daly, \emph{A Guide to \LaTeX}, 3rd~ed.\hskip 1em plus
-  0.5em minus 0.4em\relax Harlow, England: Addison-Wesley, 1999.
+\bibitem{lnet}
+P. Braam, P. Schwan, and R. Brightwell, ``Portals and Networking for the Lustre File
+System'', in proceedings of \emph{IEEE International Conference on Cluster Computing},
+2002.
+\bibitem{portals}
+R. Brightwell, R. Reisen, B. Lawry, and A. B. Maccabe, ``Portals 3.0: Protocol Building
+Blocks for Low Overhead Communication'', in proceedings of \emph{2002 Workshop on
+Communication Architecture for Clusters}, 2002.
+\bibitem{dongarra:exascale-talk-2010}
+J. Dongarra, ``Impact of Architecture and Technology for Extreme Scale on Software
+and Algorithm Design'', in the proceedings of \emph{The Department of Energy Workshop on
+Cross-cutting Technologies for Computing at the Exascale}, Feb. 2010.
+\bibitem{intel-mpi}
+Intel MPI Library, Intel, Inc.,
+\url{http://software.intel.com/en-us/articles/intel-mpi-library/}
+\bibitem{mpi}
+Message Passing Interface Forum. ``MPI: A message-passing interface standard'',
+\emph{Technical Report}, 1994.
+\bibitem{mpich2}
+MPICH2 development team, MPICH2, \url{http://www.mcs.anl.gov/mpi/mpich2}
+\bibitem{mvapich}
+MVAPICH, Department of Computer Science and Engineering, Ohio State University,
+\url{http://mvapich.cse.ohio-state.edu/} \bibitem{mx}
+MyrinetExpress (MX), Myricom, Inc., \url{http://www.myri.com/}
+\bibitem{ofa-verbs}
+Open Fabrics Alliance, \url{http://www.openfabrics.org}
+\bibitem{ompi}
+Open MPI: Open source high performance computing, \url{http://www.open-mpi.org}
+\bibitem{platform-mpi}
+Platform MPI, Platform Computing, Inc.,
+\url{http://www.platform.com/cluster-computing/platform-mpi}
+\bibitem{psm}
+PathScale Messages (PSM), Qlogic, Inc.,
+\url{http://www.qlogic.com/SiteCollectionDocuments/Products/Products_RightNAV_pdfs/infiniband\%20hcas/IB6054601-00.pdf}
+\bibitem{srq}
+S. Sur et al, ``Shared Receive Queue Based Scalable MPI Design for InfiniBand Clusters'',
+in the proceedings of \emph{International Parallel and Distributed Processing Symposium
+(IPDPS)}, 2006.
+\bibitem{via}
+T. von Eicken and W. Vogels, ``Evolution of the Virtual Interface Architecture'', in
+\emph{IEEE Computer}, Vol. 31, Nov. 1998, pp. 61-68. 
+
+
 
 \end{thebibliography}
 
