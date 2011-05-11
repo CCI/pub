@@ -5,7 +5,7 @@
 \usepackage{url}
 
 % correct bad hyphenation here
-\hyphenation{op-tical net-works semi-conduc-tor}
+\hyphenation{op-tical net-works semi-conduc-tor Myri-com}
 
 \begin{document}
 %
@@ -37,10 +37,43 @@ The abstract goes here.
 \section{Introduction}
 Introduction text goes here.
 
-\section{First section}
+\section{Current State of the Art}
+Over the years, many communication interfaces have come and gone. The few that have
+remained and seen wide-spread adoption are BSD sockets\cite{BSD}, the Message Passing
+Interface (MPI)\cite{MPI}, and some vendor-specific application programming interfaces
+(API).
+
+\subsection{Sockets} The socket interface is the most widely used by far. All major
+operating systems provide support for sockets and the Internet and all the services it
+provides would not exist without it. The popularity of sockets can be attributed to:
+
+\begin{itemize}
+\item Simple API
+\item Robustness
+\item Asynchronous operations
+\end{itemize}
+
+The API provides stream and datagram based modes, connection-oriented and connection-less
+modes, and client/server semantics for connection-oriented modes. Based on the transport,
+the API can supports multiple delivery modes (unicast, multicast, and/or broadcast). The
+API does not provide for collective communication nor does it provide one-sided
+operations.
+
+Sockets implementations are mature and well understood. It does not assume or require
+special hardware features (nor can it exploit them if they exist).
+
+Both sends and receives are buffered allowing operations to complete quickly (if buffer
+space is available for sends or data exists in the buffer for receives). Applications may
+also choose to not block if need be. The downside of buffering is more work is required by
+the CPU which can result in lower throughput over the network.
+
+\section{Goals for CCI}
 Text goes here
 
-\section{Second section}
+\section{The CCI Interface}
+Text goes here
+
+\section{Evaluation}
 Text goes here
 
 \section{Conclusion}
