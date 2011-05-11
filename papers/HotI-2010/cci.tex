@@ -103,7 +103,7 @@ memory registration.\note{Patrick, can you elaborate?}
 
 \subsection{Vendor APIs} There are numberous vendor- and organization-specific APIs
 including Infiniband's Verbs\cite{ofa-verbs}, Cray/Sandia's Portals\cite{portals}, Qlogic's
-PSM\cite{psm}, Myricom's MX\cite{mx}, LBL's Gasnet\cite{gasnet}, and so on.  Overall, they
+PSM\cite{psm}, Myricom's MX\cite{mx}, LBL's GASNet\cite{gasnet}, and so on.  Overall, they
 provide a lot of choice, but none is perfect (i.e. none have convinced they others to
 adopt their API).  Since most are targeted to specific hardware, the APIs tend to be more
 complicated.
@@ -111,7 +111,7 @@ complicated.
 Based on the earlier VIA specification\cite{via}, the Infiniband standard does not specify
 an API; it only specifies which \emph{verbs} must be supported. After many vendors created
 separate Verbs APIs, they eventually coalesced into the Open Fabric Association's (OFA)
-Verbs. OFA's Verbs has had the broadest adoption, yet it still represents less than 50\%
+Verbs. OFA's Verbs has had the broadest adoption, yet it still represents less than 43\%
 of the machines on the Top 500\cite{top500} with some, but much less, adoption outside of
 HPC.
 
@@ -203,49 +203,81 @@ The authors would like to thank...
 % <OR> manually copy in the resultant .bbl file
 % set second argument of \begin to the number of references
 % (used to reserve space for the reference number labels box)
-\begin{thebibliography}{10}
+\begin{thebibliography}{20}
+
+\bibitem{mpi-ft}
+R. Batchu et al, ``MPI/FT TM : Architecture and taxonomies for fault-tolerant,
+message-passing middleware for performance-portable parallel computing'', in proceedings
+of \emph{1st IEEE International Symposium of Cluster Computing and the Grid}, 2001, pp.
+26-33.
 
 \bibitem{lnet}
 P. Braam, P. Schwan, and R. Brightwell, ``Portals and Networking for the Lustre File
 System'', in proceedings of \emph{IEEE International Conference on Cluster Computing},
 2002.
+
 \bibitem{portals}
 R. Brightwell, R. Reisen, B. Lawry, and A. B. Maccabe, ``Portals 3.0: Protocol Building
 Blocks for Low Overhead Communication'', in proceedings of \emph{2002 Workshop on
 Communication Architecture for Clusters}, 2002.
+
 \bibitem{dongarra:exascale-talk-2010}
 J. Dongarra, ``Impact of Architecture and Technology for Extreme Scale on Software
 and Algorithm Design'', in the proceedings of \emph{The Department of Energy Workshop on
 Cross-cutting Technologies for Computing at the Exascale}, Feb. 2010.
+
+\bibitem{ft-mpi}
+G. Fagg and J. Dongarra, ``FT-MPI: Fault Tolerant MPI, supporting dynamic applications in
+a dynamic world'', 2000.
+
+\bibitem{gasnet}
+GASNet, \url{http://gasnet.cs.berkeley.edu/}.
+
 \bibitem{intel-mpi}
 Intel MPI Library, Intel, Inc.,
-\url{http://software.intel.com/en-us/articles/intel-mpi-library/}
+\url{http://software.intel.com/en-us/articles/intel-mpi-library/}.
+
 \bibitem{mpi}
 Message Passing Interface Forum. ``MPI: A message-passing interface standard'',
 \emph{Technical Report}, 1994.
+
 \bibitem{mpich2}
-MPICH2 development team, MPICH2, \url{http://www.mcs.anl.gov/mpi/mpich2}
+MPICH2 development team, MPICH2, \url{http://www.mcs.anl.gov/mpi/mpich2}.
+
 \bibitem{mvapich}
 MVAPICH, Department of Computer Science and Engineering, Ohio State University,
-\url{http://mvapich.cse.ohio-state.edu/} \bibitem{mx}
-MyrinetExpress (MX), Myricom, Inc., \url{http://www.myri.com/}
+\url{http://mvapich.cse.ohio-state.edu/}.
+
+\bibitem{mx}
+MyrinetExpress (MX), Myricom, Inc., \url{http://www.myri.com/}.
+
 \bibitem{ofa-verbs}
-Open Fabrics Alliance, \url{http://www.openfabrics.org}
+Open Fabrics Alliance, \url{http://www.openfabrics.org}.
+
 \bibitem{ompi}
-Open MPI: Open source high performance computing, \url{http://www.open-mpi.org}
+Open MPI: Open source high performance computing, \url{http://www.open-mpi.org}.
+
 \bibitem{platform-mpi}
 Platform MPI, Platform Computing, Inc.,
-\url{http://www.platform.com/cluster-computing/platform-mpi}
+\url{http://www.platform.com/cluster-computing/platform-mpi}.
+
 \bibitem{psm}
 PathScale Messages (PSM), Qlogic, Inc.,
-\url{http://www.qlogic.com/SiteCollectionDocuments/Products/Products_RightNAV_pdfs/infiniband\%20hcas/IB6054601-00.pdf}
+\url{http://www.qlogic.com/SiteCollectionDocuments/Products/Products_RightNAV_pdfs/infiniband%20hcas/IB6054601-00.pdf}.
+
 \bibitem{srq}
 S. Sur et al, ``Shared Receive Queue Based Scalable MPI Design for InfiniBand Clusters'',
 in the proceedings of \emph{International Parallel and Distributed Processing Symposium
 (IPDPS)}, 2006.
+
+\bibitem{top500}
+Top 500 Interconnect Family share for 11/2010,
+\url{http://www.top500.org/stats/list/36/connfam}.
+
 \bibitem{via}
 T. von Eicken and W. Vogels, ``Evolution of the Virtual Interface Architecture'', in
 \emph{IEEE Computer}, Vol. 31, Nov. 1998, pp. 61-68. 
+
 
 
 
