@@ -129,7 +129,7 @@ this?}
 The Portals API provides one-sided semantics (i.e.  Put/Get), uses match tags to steer
 messages to the correct buffers. The API is connection-less and leaves it up to the NAL to
 maintain any necessary connection state internally. Portals is mostly used on the large
-Cray systems such as ORNL's Jaguar\cite{jaguar} and Sandia's Red Sky\cite{red-sky}.  The
+Cray systems such as ORNL's Jaguar\cite{jaguar} and LANL's Cielo\cite{cielo}.  The
 Lustre distributed file system NAL, LNET, was originally based on Portals\cite{lnet}.
 
 Both designed for implementing MPI, Myricom's MyrinetExpress (MX) and Qlogic's PathScale
@@ -144,10 +144,12 @@ portability, simplicity, performance, scalability, and robustness.
 
 \subsection{Portability}
 For any new interface to gain acceptance in the broader (HPC and non-HPC) community, it
-needs to provide the semantics that are common to most vendor interfaces.
+needs to provide the semantics that are common to most vendor interfaces.\note{we need
+more here}
 
 \subsection{Simplicity}
-The socket interface is the reference. It is flexible without being overly complicated.
+The socket interface is the reference. It is flexible without being overly
+complicated.\note{we need more here}
 
 \subsection{Performance}
 Ideally, an API would provide asynchronous operations to allow overlap between computation
@@ -156,14 +158,34 @@ provide support for zero-copy, OS-bypass when hardware support is available. Las
 would provide support for one-sided operations.
 
 \subsection{Scalability}
-Projections for exascale systems include 100,000s of nodes and 1,000,000s of
+Projections for exascale systems include hundreds of thousands of nodes and millions of
 cores\cite{dongarra:exascale-talk-2010}. To maximize scalability, an API must provide
 demultiplexing\note{Patrick, what do you have in mind here?}, use shared resources as much
 as possible, and support NUMA/multicore systems.
 
 \subsection{Robustness}
-Robustness: connection-oriented semantics, error recovery, support for unreliable
-communications including multicast
+A robust API should include connection-oriented semantics, error recovery, and support for
+unreliable communications including multicast.
+
+A new API should not hide the connection handling under the covers like MPI or Portals.
+As with sockets, using connection-oriented semantics is familiar and well understood. We
+do not mean that an implementation must maintain connection state. It is possible that
+some implementations might handle connection state in a kernel driver or in the NIC or not
+require any at all. The idea of requiring the connection-oriented semantics is that a
+\emph{client} connects to a \emph{server} and the server chooses to accept or reject the
+client's request. It is also an opportunity to allow the client to pass credentials to the
+server if authentication and/or authorization is required and it is an opportunity for the
+two sides to negotiate message sizes, the number of messages in flight, and other internal
+information as appropriate.
+
+As systems scale larger, error recovery needs to be simple and well-defined.\note{we need
+more here}
+
+Not all applications require reliable communications such as high-frequency financial
+trading, video delivery, and distributed, system-health monitoring services that want the
+most recent data and cannot wait for retransmission. Given that, an API should provide
+unreliable connections in addition to reliable ones. Support should also be provided for
+unrelibale multicast if the hardware supports it.
 
 \section{The CCI Interface}
 Text goes here
@@ -203,7 +225,7 @@ The authors would like to thank...
 % <OR> manually copy in the resultant .bbl file
 % set second argument of \begin to the number of references
 % (used to reserve space for the reference number labels box)
-\begin{thebibliography}{20}
+\begin{thebibliography}{30}
 
 \bibitem{mpi-ft}
 R. Batchu et al, ``MPI/FT TM : Architecture and taxonomies for fault-tolerant,
@@ -221,6 +243,9 @@ R. Brightwell, R. Reisen, B. Lawry, and A. B. Maccabe, ``Portals 3.0: Protocol B
 Blocks for Low Overhead Communication'', in proceedings of \emph{2002 Workshop on
 Communication Architecture for Clusters}, 2002.
 
+\bibitem{cielo}
+Cielo, Los Alamos National Lab, \url{http://www.lanl.gov/programs/asc/cielo_capability.shtml}.
+
 \bibitem{dongarra:exascale-talk-2010}
 J. Dongarra, ``Impact of Architecture and Technology for Extreme Scale on Software
 and Algorithm Design'', in the proceedings of \emph{The Department of Energy Workshop on
@@ -236,6 +261,10 @@ GASNet, \url{http://gasnet.cs.berkeley.edu/}.
 \bibitem{intel-mpi}
 Intel MPI Library, Intel, Inc.,
 \url{http://software.intel.com/en-us/articles/intel-mpi-library/}.
+
+\bibitem{jaguar}
+Jaguar, National Center for Computational Science, Oak Ridge National Lab,
+\url{http://www.nccs.gov/computing-resources/jaguar/}.
 
 \bibitem{mpi}
 Message Passing Interface Forum. ``MPI: A message-passing interface standard'',
