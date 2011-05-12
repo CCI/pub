@@ -37,7 +37,10 @@ The abstract goes here.
 % creates the second title. It will be ignored for other modes.
 \IEEEpeerreviewmaketitle
 
+% insert draft notes - highlights with a yellow box and prefixes with "Note: "
 \newcommand{\note}[1]{\colorbox{yellow!50}{Note: #1}}
+
+\newcommand{\f}[1]{\texttt{#1()}}
 
 \section{Introduction}
 Introduction text goes here.
@@ -121,10 +124,9 @@ and connection-less. Verbs does not support buffering; all receives must be post
 sending. Also, all data movement operations require pinning the memory in advance. For the
 most common reliable, connection-oriented communication, Verbs requires that the two
 processes establish a queue-pair (QP), which is much more cumbersome than socket's
-\texttt{connect()} and \texttt{accept()}. Lastly, requiring QPs between all processes has
-memory scaling issues. Work has been done with shared receive queues (SRQ) in MPI\cite{srq} to
-help increase the scalability of Verb's based systems.\note{can someone review all of
-this?}
+\f{connect} and \f{accept}. Lastly, requiring QPs between all processes has memory scaling
+issues. Work has been done with shared receive queues (SRQ) in MPI\cite{srq} to help
+increase the scalability of Verb's based systems.\note{can someone review all of this?}
 
 The Portals API provides one-sided semantics (i.e.  Put/Get), uses match tags to steer
 messages to the correct buffers. The API is connection-less and leaves it up to the NAL to
@@ -188,7 +190,45 @@ unreliable connections in addition to reliable ones. Support should also be prov
 unrelibale multicast if the hardware supports it.
 
 \section{The CCI Interface}
-Text goes here
+In this section, we provide a brief overview of the CCI API to allow us to discuss how CCI
+can meet the goals outlined above. Each funtion call is prefixed by \texttt{cci\_} which
+we omit below for brevity.
+
+\subsection{Initialization}
+
+Before calling any function, the application must call \f{init}. The application
+may call init multiple times with different parameters. The application can then call
+\f{get\_devices} to obtain an array of available devices. The devices are parsed
+from a config file and each device has a name, an array keyword/value strings, a maximum
+send size in bytes, and PCI information if needed. Each device's maximum send size is
+equivalent to the netowrk MTU. When no more communication is needed, the application calls
+\f{free\_devices}.
+
+\subsection{Communication Endpoints}
+
+All communication in CCI revolves around an endpoint. Each endpoint has some number of
+device-sized buffers available for sending and receiving messages of small, unexpected
+messages. The application calls \f{create\_endpoint} and \f{destroy\_endpoint},
+respectively, to obtain or release an endpoint. The application may alter the number of
+send and/or recieve buffers using \f{get\_opt} and \f{set\_opt}.
+
+\subsection{Event Handling}
+CCI is inherently asynchronous and all communication functions only initiate
+communication. When a communication completes, it generates an event. There are three
+event types: SEND, RECV, and OTHER. Other returns connection success, rejection or timeout
+events as well as endpoint and/or device failure events.
+
+An application can poll for an event with \f{get\_event}, which returns an event structure of
+which the contents vary depending on the event's type. In addition to returing an
+endpoint, \f{create\_endpoint} also returns an operating system-specific handle that can
+be passed to \f{select} or other OS functions to allow blocking until an event is
+available.
+
+\subsection{Connection Handling}
+
+\subsection{Active Messages}
+
+\subsection{RMA}
 
 \section{Evaluation}
 Text goes here
