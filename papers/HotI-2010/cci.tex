@@ -40,6 +40,7 @@ The abstract goes here.
 % insert draft notes - highlights with a yellow box and prefixes with "Note: "
 \newcommand{\note}[1]{\colorbox{yellow!50}{Note: #1}}
 
+% function names - adds (), sets tt
 \newcommand{\f}[1]{\texttt{#1{\kern-2pt}()}}
 
 \section{Introduction}
@@ -387,10 +388,31 @@ the header is specified.
 \section{How CCI Achieves the Design Goals}
 
 \subsection{Built-in Connection Broker}
+\note{what do we want to say here?}
 
 \subsection{Benefits of CCI's Active Messages}
 
+\note{Below is mostly Patrick's text from his outline}
+Buffered messages as in sockets provide asynchronism but consume time and space.
+Asynchronism is fundamental for scalability, but space is bounded and time is precious.
+Matching interfaces (as used in MPI) are powerful but very complex. The matching semantics
+(wildcards) may require coherent matching implementation, preventing effective offload
+(has to be done in the host). Furthermore, matching generally requires support for
+unexpected messages, which consumes time and space. Finally matching interfaces are
+stateful, which is bad for fault-tolerance and offload.  Socket's SOCK\_STREAM semantic is
+akin to ordered matching, all messages demultiplexed to the same destination socket are
+treated as unexpected messages until consumed.
+
+Active Messages is well known solution but has two problems: async handlers and reassembly
+of large messages.  Async handlers are unbounded in term of running time. CCI uses events
+instead.  Messages larger than MTU requires reassembly: means stateful (bad), means
+unexpected buffers (bad). The solution is to limit message size to MTU,
+segmentation/reassembly in application.
+
+
 \subsection{Benefits of CCI's RMA}
+\note{thoughts?} Explicit memory registration which is missing from MPI.\note{why is this
+good, George?} Simpler semantics and coding compared to Verbs.\note{is this true, Dave?}
 
 \section{Evaluation}
 Text goes here
