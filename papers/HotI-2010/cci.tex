@@ -252,7 +252,7 @@ provides multiple types of connection attributes:
 If a process needs a mix of types, it is allowed to open multiple connections to the other
 process.
 
-\subsection{Connection Handling}
+\subsection{Connection Establishment}
 As we previously discussed, part of the robustness of the sockets API is its client/server
 connection semantics. CCI mirrors those semantics. A process willing to accept connections
 will first \f{bind} a device to a name service at a specified \emph{port} and a
@@ -328,7 +328,7 @@ CCI also provides a \f{sendv} function that takes an array of data pointers and 
 of lengths instead of the just the one data pointer and length in \f{send}. Lastly, CCI
 does not require memory registration for sending or receiving active messages.
 
-\subsection{RMA}
+\subsection{Remote Memory Access}
 Clearly, messages limited to a single MTU will not meet the needs of all applications.
 Applications such as file systems which need to move large, bulk messages need much more.
 To accommodate them, CCI also provides remote memory access (RMA). RMA transfers are only
