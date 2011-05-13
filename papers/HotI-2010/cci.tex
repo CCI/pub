@@ -72,8 +72,9 @@ special hardware features (nor can it exploit them if they exist).
 
 Both sends and receives are buffered allowing operations to complete quickly (if buffer
 space is available for sends or data exists in the buffer for receives). Applications may
-also choose to not block if need be. The downside of buffering is more work is required by
-the CPU which can result in lower throughput over the network.
+also choose to not block if send buffers are full or receive buffers are empty if need be.
+The downside of buffering is more work is required by the CPU which can result in lower
+throughput over the network.
 
 \subsection{MPI} In the high performance computing (HPC) arena, MPI is the dominant
 interface for inter-process communication. Designed for maximum scalability, MPI has a
@@ -331,9 +332,11 @@ allowed on reliable connections.
 
 Before using RMA, the process needs to explicitly register the memory. CCI provides
 \f{rma\_register} which takes pointers to the endpoint, the connection, and the start of
-the region to be registered as well as the length of the region. It returns a RMA handle.
-When a process no longer needs to RMA in to or out of the region, it passes the handle to
-\f{rma\_deregister}.
+the region to be registered as well as the length of the region and it returns a RMA
+handle. If the connection pointer is set, RMA operations on that handle will be limited to
+that one connection. If the connection is NULL, then RMA operations on that handle will be
+limited to any connection on that endpoint.  When a process no longer needs to RMA in to
+or out of the region, it passes the handle to \f{rma\_deregister}.
 
 For a RMA transfer to take place, both processes must register their local memory and they
 need to pass the handle of the target process to the initiator process using one or more
@@ -351,6 +354,29 @@ int rma(cci_connection_t *connection,
         void *context,
         int flags);
 \end{verbatim}
+
+The call takes the connection pointer, an optional header pointer and length, the local
+RMA handle and offset, the remote RMA handle and offset, the transfer length, an
+application context pointer, and a set of flags.
+
+If the header pointer and length are set, the initiator will send a completion message to
+the target that arrives as an active message with the header set and no data payload. Like
+with \f{send}, the header length is limited to 32 bytes.
+
+The flag options include:
+
+\begin{description}
+\item BLOCKING (see \f{send})
+\item SILENT (see \f{send})
+\item READ allows data to move from remote to local memory.
+\item WRITE allows data to move from local to remote memory.
+\item FENCE means wait for all previous RMA operations to complete before performing this
+operation and all following RMA operations.
+\end{description}
+
+CCI does not guarantee delivery order within an operation (i.e. no last-byte-written-last
+mandate), but order is guaranteed between data delivery and the remote receive event if
+the header is specified.
 
 \section{Evaluation}
 Text goes here
