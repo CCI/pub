@@ -6,6 +6,7 @@
 
 \usepackage{color}
 \usepackage{xcolor}
+\usepackage{amsmath}
 
 % correct bad hyphenation here
 \hyphenation{op-tical net-works semi-conduc-tor Myri-com Myrinet-Express Path-Scale}
@@ -414,8 +415,97 @@ segmentation/reassembly in application.
 \note{thoughts?} Explicit memory registration which is missing from MPI.\note{why is this
 good, George?} Simpler semantics and coding compared to Verbs.\note{is this true, Dave?}
 
-\section{Evaluation}
-Text goes here
+\section{Status and Evaluation}
+We have two partial, proof-of-concept implementations, one over UDP sockets and
+one over Portals 3.3.
+
+The socket prototype driver opens one SOCK\_DGRAM (UDP) socket per CCI endpoint
+and has to provide reliability (acknowledgement and retransmission on loss).
+The socket driver also has to multiplex connections over the single socket.
+Enough functions are complete including RMA write to allow simple pingpong
+tests to exercise the CCI API.
+
+The Portals implementation also implements enough functions to run a pingpong
+test with active messages. Since Portals assumes a reliable interconnect, the
+only difference between a CCI UU connection and a RO/RU connection is that we
+complete a UU send when we receive the Portals' SEND\_END event which indicates
+that the sender's buffer is no longer needed (i.e. the data is on the wire).
+For a reliable connection, we report a completion when we get the Portals' ACK
+of receipt at the peer. We wrote a native Portals pingpong and compared it to
+the CCI pingpong performance. We ran tests on a Cray XT6 and locked the
+processes to the same cores for both tests. The CCI over Portals
+\begin{math}\frac{1}{2}\end{math}RTT was less than 200 ns more than the antive
+Portals' performance, 6.0 $\mu$\textit{s} versus 5.8 us.
+
+\subsection{Simplicity} An example of an application library that supports
+multiple networking APIs is Open-MPI (OMPI). OMPI has support for seven
+networking APIs (ignoring self, shared memory, and the OFA unreliable Datagram
+which is disabled). The total lines of code to implement OMPI's Byte Transfer
+Layer (BTL) for each of the APIs is listed in Table \ref{tab:btl}.
+
+\begin{table}[!t] \centering
+\caption{Lines of Code Per BTL}
+\label{tab:btl}
+\begin{IEEEeqnarraybox}[\IEEEeqnarraystrutmode\IEEEeqnarraystrutsizeadd{2pt}{1pt}]{v/s/v/s/v}
+\IEEEeqnarrayrulerow\\ &\mbox{BTL}&&LOC&\\
+\IEEEeqnarraydblrulerow\\
+\IEEEeqnarrayseprow[3pt]\\ &Elan&&1,656&\IEEEeqnarraystrutsize{0pt}{0pt}\\
+\IEEEeqnarrayseprow[3pt]\\
+\IEEEeqnarrayrulerow\\
+\IEEEeqnarrayseprow[3pt]\\ &MX&&2,333&\IEEEeqnarraystrutsize{0pt}{0pt}\\
+\IEEEeqnarrayseprow[3pt]\\
+\IEEEeqnarrayrulerow\\
+\IEEEeqnarrayseprow[3pt]\\ &Portals&&2,469&\IEEEeqnarraystrutsize{0pt}{0pt}\\
+\IEEEeqnarrayseprow[3pt]\\
+\IEEEeqnarrayrulerow\\
+\IEEEeqnarrayseprow[3pt]\\ &GM&&2,779&\IEEEeqnarraystrutsize{0pt}{0pt}\\
+\IEEEeqnarrayseprow[3pt]\\
+\IEEEeqnarrayrulerow\\
+\IEEEeqnarrayseprow[3pt]\\ &Sockets (TCP)&&4,192&\IEEEeqnarraystrutsize{0pt}{0pt}\\
+\IEEEeqnarrayseprow[3pt]\\
+\IEEEeqnarrayrulerow\\
+\IEEEeqnarrayseprow[3pt]\\ &UDAPL&&6,208&\IEEEeqnarraystrutsize{0pt}{0pt}\\
+\IEEEeqnarrayseprow[3pt]\\
+\IEEEeqnarrayrulerow\\
+\IEEEeqnarrayseprow[3pt]\\ &OpenIB (Verbs)&&13,994&\IEEEeqnarraystrutsize{0pt}{0pt}\\
+\IEEEeqnarrayseprow[3pt]\\
+\IEEEeqnarrayrulerow
+\end{IEEEeqnarraybox}
+\end{table}
+
+Given the authors work with MX, GM, sockets, and Portals, we expect that a BTL
+implementation using CCI would be smaller than MX and hopefully smaller than
+Elan.
+
+\subsection{Portability}
+
+\subsection{Performance}
+
+\subsection{Scalability}
+
+\subsection{Robustness}
+
+%** elan **
+    %1656 total
+%** gm **
+    %2779 total
+%** mx **
+    %2333 total
+%** ofud **
+    %2332 total
+%** openib **
+   %13994 total
+%** portals **
+    %2469 total
+%** self **
+     %985 total
+%** sm **
+    %2189 total
+%** tcp **
+    %4192 total
+%** udapl **
+    %6208 total
+
 
 \section{Conclusion}
 The conclusion goes here.
