@@ -483,6 +483,11 @@ Elan.
 
 \subsection{Scalability}
 
+For the Portals driver, each connection requires 104 bytes on 64-bit machines
+(20 bytes for the public CCI connection struct, 20 bytes for the private CCI
+struct, and 64 bytes for the Portals driver connection struct.  The sock driver
+needs 100 bytes for each connection.
+
 \subsection{Robustness}
 
 %** elan **
