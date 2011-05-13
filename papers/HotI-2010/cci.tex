@@ -231,15 +231,15 @@ blocking until an event is available.
 
 \subsection{Connections}
 CCI defines a \emph{connection} struct which includes the maximum send size negotiated by
-the two instances of CCI, a pointer to the owning endpoint, and the connection attributes.
+the two instances of CCI, a pointer to the owning endpoint, and the connection attribute.
 
 As mentioned above, some applications may need reliable delivery while other may not.
 Among applications needing reliable delivery, some may need in-order completion (e.g.
 traditional SOCK\_STREAM semantics) and others may accept out-of-order completion as long
 as communications are initiated in-order (e.g. MPI point-to-point).
 
-In order to provide applications with as much or as little guarantees as possible, CCI
-provides multiple types of connection attributes:
+In order to provide applications with the level of service appropriate for their needs,
+CCI provides multiple types of connection attributes:
 
 \begin{itemize}
 \item Reliable with Ordered completion (RO)
@@ -280,7 +280,7 @@ client gets an OTHER event with a type of CONNECT\_TIMEOUT. When a process no lo
 a connection, it can call \f{disconnect}.
 
 \subsection{Active Messages}
-Once the connection is established, the two processes can start communications. CCI
+Once the connection is established, the two processes can start communicating. CCI
 provides two methods, active messages and remote memory access (RMA), which we discuss in
 the next section.
 
@@ -294,10 +294,12 @@ size limited to a single MTU vastly simplifies the requirements for message comp
 either it arrives or it does not.
 
 Where CCI differs from the original Active Messages is handling of incoming messages.  In
-Active Messages, the message contains a pointer to the handler that will process it.  The
-difficulty with invoking handlers is there is no bound on how long the handler will run.
-While running, the communication library cannot process any more messages and could lead
-to dropping messages. Instead, CCI returns an event of type RECV.
+Active Messages, the message contains an address of the handler that will process it,
+which assumes all processes have identical memory spaces.  The difficulty with invoking
+handlers is there is no bound on how long the handler will run.  While running, the
+communication library cannot process any more messages and could lead to dropping
+messages. Instead, CCI returns an event of type RECV. The application can get the event
+and hold it without blocking CCI from continuing to service other communications.
 
 The \f{send} parameters include the connection, header and data pointers and their
 respective lengths, an application context pointer, and flags. Either or both of the
@@ -381,6 +383,8 @@ operation and all following RMA operations.
 CCI does not guarantee delivery order within an operation (i.e. no last-byte-written-last
 mandate), but order is guaranteed between data delivery and the remote receive event if
 the header is specified.
+
+\section{How CCI Achieves the Design Goals}
 
 \section{Evaluation}
 Text goes here
