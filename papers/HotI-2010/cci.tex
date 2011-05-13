@@ -300,6 +300,17 @@ pointers may be NULL. The header is currently limited to a maximum length of 32 
 context pointer is returned in the SEND completion event and can be used to allow the
 application to retrieve its internal state.
 
+The optional flags parameter can accept the following:
+
+\begin{description}
+\item BLOCKING which means that the send should not return until the send
+completes. The send completion status is passed in the function's return value.
+\item NO\_COPY is a hint to CCI that the application does not need the buffer
+back until the send completes and is free to use zero-copy methods if supported.
+\item SILENT indicates that the process does not want a completion event for this
+send.
+\end{description}
+
 On the receiver, a call to \f{get\_event} returns a RECV event which includes pointers to
 the header and data, their lengths, and a pointer to the connection. The receiving process
 can choose to simply inspect the data in-place, modify the data in-place and send it to
@@ -308,10 +319,38 @@ no longer needs the buffer, it releases it back to CCI with \f{return\_event}. I
 be noted that if the application does not process RECV events and return them to CCI fast
 enough, that CCI may still need to drop incoming messages.
 
+CCI also provides a \f{sendv} function that takes an array of data pointers and an array
+of lengths instead of the just the one data pointer and length in \f{send}. Lastly, CCI
+does not require memory registration for sending or receiving active messages.
+
 \subsection{RMA}
 Clearly, messages limited to a single MTU will not meet the needs of all applications.
 Applications such as file systems which need to move large, bulk messages need much more.
-To accommodate them, CCI also provides remote memory access (RMA).
+To accommodate them, CCI also provides remote memory access (RMA). RMA transfers are only
+allowed on reliable connections.
+
+Before using RMA, the process needs to explicitly register the memory. CCI provides
+\f{rma\_register} which takes pointers to the endpoint, the connection, and the start of
+the region to be registered as well as the length of the region. It returns a RMA handle.
+When a process no longer needs to RMA in to or out of the region, it passes the handle to
+\f{rma\_deregister}.
+
+For a RMA transfer to take place, both processes must register their local memory and they
+need to pass the handle of the target process to the initiator process using one or more
+active messages. The full \f{rma} signature is:
+
+\begin{verbatim}
+int rma(cci_connection_t *connection,
+        void *header_ptr,
+        uint32_t header_len,
+        uint64_t local_handle,
+        uint64_t local_offset,
+        uint64_t remote_handle,
+        uint64_t remote_offset,
+        uint64_t data_len,
+        void *context,
+        int flags);
+\end{verbatim}
 
 \section{Evaluation}
 Text goes here
