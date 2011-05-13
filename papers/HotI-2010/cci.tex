@@ -76,6 +76,9 @@ also choose to not block if send buffers are full or receive buffers are empty i
 The downside of buffering is more work is required by the CPU which can result in lower
 throughput over the network.
 
+Sockets, when used with SOCK\_STREAM (i.e. TCP), do not scale well since each connection
+requires a separate socket and each socket has its own send and receive buffers.
+
 \subsection{MPI} In the high performance computing (HPC) arena, MPI is the dominant
 interface for inter-process communication. Designed for maximum scalability, MPI has a
 richer, but more complicated API.
@@ -164,7 +167,8 @@ would provide support for one-sided operations.
 Projections for exascale systems include hundreds of thousands of nodes and millions of
 cores\cite{dongarra:exascale-talk-2010}. To maximize scalability, an API must provide
 demultiplexing\note{Patrick, what do you have in mind here?}, use shared resources as much
-as possible, and support NUMA/multicore systems.
+as possible, and support NUMA/multicore systems. Resources cannot grow linearly with the
+number of communicating partners.
 
 \subsection{Robustness}
 A robust API should include connection-oriented semantics, error recovery, and support for
