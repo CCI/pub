@@ -19,9 +19,10 @@ of receipt at the peer. We wrote a native Portals pingpong and compared it to
 the CCI pingpong performance. We ran tests on a Cray XT6 and locked the
 processes to the same cores for both tests. The CCI over Portals
 \begin{math}\frac{1}{2}\end{math}RTT was less than 200 ns more than the native
-Portals' performance, 5.90 \us\kern+3pt versus 5.74 \us.
-
-
+Portals' performance up to 256 bytes. For an eight byte message, for example,
+CCI's latency is 5.91 \us versus 5.74 \us for native Portals. Figures
+\ref{fig:latency} and \ref{fig:bw} show latency and bandwidth for active messages
+up to 8 KB on a Cray XT6.
 
 Given the authors work with MX, GM, sockets, and Portals, we expect that a BTL
 implementation using CCI would be smaller than MX and hopefully smaller than
