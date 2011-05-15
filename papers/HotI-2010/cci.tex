@@ -21,12 +21,11 @@
     Galen Shipman\IEEEauthorrefmark{1},\\
     Patrick Geoffray\IEEEauthorrefmark{2},
     Jeffrey M.\ Squyres\IEEEauthorrefmark{3} and
-    George Bosilca\IEEEauthorrefmark{4}}\newline
+    George Bosilca\IEEEauthorrefmark{4}}
   \IEEEauthorblockA{\IEEEauthorrefmark{1}Oak Ridge National Laboratory, Oak Ridge, TN}
   \IEEEauthorblockA{\IEEEauthorrefmark{2}Myricom, Inc., Arcadia, CA}
-  \IEEEauthorblockA{\IEEEauthorrefmark{3}Cisco Systems, Inc., San
-    Jose, CA}
-  \IEEEauthorblockA{\IEEEauthorrefmark{4}University of Tennessee, Knoxville}}
+  \IEEEauthorblockA{\IEEEauthorrefmark{3}Cisco Systems, Inc., San Jose, CA}
+  \IEEEauthorblockA{\IEEEauthorrefmark{4}University of Tennessee, Knoxville, TN}}
 
 % make the title area
 \maketitle
@@ -73,7 +72,7 @@
 \section{Introduction}
 Introduction text goes here.
 
-\section{Current State of the Art}
+\section{State of the Art}
 Over the years, many communication interfaces have come and gone. The few that have
 remained and seen wide-spread adoption are BSD sockets\cite{bsd}, the Message Passing
 Interface (MPI)\cite{mpi}, and some vendor-specific application programming interfaces
@@ -143,6 +142,8 @@ provide a lot of choice, but none is perfect (i.e. none have convinced they othe
 adopt their API).  Since most are targeted to specific hardware, the APIs tend to be more
 complicated.
 
+\note{Mention DAPL}.
+
 Based on the earlier VIA specification\cite{via}, the Infiniband standard does not specify
 an API; it only specifies which \emph{verbs} must be supported. After many vendors created
 separate Verbs APIs, they eventually coalesced into the Open Fabric Association's (OFA)
@@ -172,90 +173,187 @@ buffering for smaller messages and remote direct memory access for larger messag
 are connection-less in that the target does not have to accept.  Both provide reliable,
 in-order matching, but out-of-order completion.
 
-\section{Goals for CCI}
-In setting out to design a new communication's interface, we had several goals in mind:
-portability, simplicity, performance, scalability, and robustness.
+\section{Design Goals}
+In setting out to design a new communication's interface, we had several goals 
+in mind: portability, simplicity, performance, scalability, and robustness.
 
 \subsection{Portability}
-For any new interface to gain acceptance in the broader (HPC and non-HPC) community, it
-needs to provide the semantics that are common to most vendor interfaces.\note{we need
-more here}
+Application and middleware developers do not have the resources to continuously 
+port their code on different communication interfaces. 
+Selecting a vendor-specific API reduces competition in the market place, thus 
+increasing prices and the risks of business failure or market disruptions. It 
+also slows down the adoption of new and improved technology. 
+Similarly, vendors do not have the resources to properly support a large set 
+of middlewares. The whole ecosystem would clearly benefit from a truly unified 
+communication layer. 
+Sockets and MPI both provide such a high-level of portability. 
+For any new communication interface to gain acceptance in the broader 
+community, it needs to provide a similar breadth of implementations on 
+currently available hardware, by supporting the semantics that are common 
+to most vendor APIs.
 
 \subsection{Simplicity}
-The socket interface is the reference. It is flexible without being overly
-complicated.\note{we need more here}
+Simplicity is paramount to the success of a programing interface. Critical 
+mass cannot be reached by limitting the targeted audience to few networking 
+experts. However, ease of use involves many elements beyond just expertise. 
+Code size is a common albeit subjective metric used to compare programing 
+interfaces. The rationale is that larger codes are harder to debug and 
+maintain. For example, an analysis of the OpenMPI implementation shows great 
+differences between the 7 supported communication APIs (excluding self and 
+shared memory). The total lines of code of each Byte Transfer Layer (BTL) is 
+listed in Table \ref{tab:btl}. The Verbs BTL is the largest, triple the size 
+of the Sockets BTL, second largest, and 5 to 6 times larger than the BTLs of 
+vendor interfaces. 
+
+\begin{table}[!t] \centering
+\caption{Lines of Code per BTL}
+\label{tab:btl}
+\begin{IEEEeqnarraybox}[\IEEEeqnarraystrutmode\IEEEeqnarraystrutsizeadd{2pt}{1pt}]{v/s/v/s/v}
+\IEEEeqnarrayrulerow\\ &\mbox{BTL}&&Lines of code&\\
+\IEEEeqnarraydblrulerow\\
+\IEEEeqnarrayseprow[3pt]\\ &Elan&&1,656&\IEEEeqnarraystrutsize{0pt}{0pt}\\
+\IEEEeqnarrayseprow[3pt]\\
+\IEEEeqnarrayrulerow\\
+\IEEEeqnarrayseprow[3pt]\\ &MX&&2,333&\IEEEeqnarraystrutsize{0pt}{0pt}\\
+\IEEEeqnarrayseprow[3pt]\\
+\IEEEeqnarrayrulerow\\
+\IEEEeqnarrayseprow[3pt]\\ &Portals&&2,469&\IEEEeqnarraystrutsize{0pt}{0pt}\\
+\IEEEeqnarrayseprow[3pt]\\
+\IEEEeqnarrayrulerow\\
+\IEEEeqnarrayseprow[3pt]\\ &GM&&2,779&\IEEEeqnarraystrutsize{0pt}{0pt}\\
+\IEEEeqnarrayseprow[3pt]\\
+\IEEEeqnarrayrulerow\\
+\IEEEeqnarrayseprow[3pt]\\ &Sockets (TCP)&&4,192&\IEEEeqnarraystrutsize{0pt}{0pt}\\
+\IEEEeqnarrayseprow[3pt]\\
+\IEEEeqnarrayrulerow\\
+\IEEEeqnarrayseprow[3pt]\\ &UDAPL&&6,208&\IEEEeqnarraystrutsize{0pt}{0pt}\\
+\IEEEeqnarrayseprow[3pt]\\
+\IEEEeqnarrayrulerow\\
+\IEEEeqnarrayseprow[3pt]\\ &OpenIB (Verbs)&&13,994&\IEEEeqnarraystrutsize{0pt}{0pt}\\
+\IEEEeqnarrayseprow[3pt]\\
+\IEEEeqnarrayrulerow
+\end{IEEEeqnarraybox}
+\end{table}
+
+Another indicator of complexity is the number of functions available. Choice 
+is good but too much choice is worse. Fortunately, software programers are 
+efficient at reducing overly complex interfaces to a minimum set of useful 
+semantics.
+For example, MPI specifies over 200 functions but the vast majority of MPI 
+applications only use a fraction of them. Similarly, relative simplicity was 
+the main drive behind the wide adoption of the Socket interface. 
+A new common communication interface should aspire to find the right balance 
+between richness of semantics and ease of use.
 
 \subsection{Performance}
-Ideally, an API would provide asynchronous operations to allow overlap between computation
-and communication. Buffering may or may not be needed to provide asynchrony. The API would
-provide support for zero-copy, OS-bypass when hardware support is available. Lastly, it
-would provide support for one-sided operations.
+Performance is major drive for innovation in networking, as much in HPC as 
+in Cloud Computing. All modern network technologies leverage common techniques 
+developped in the last two decades: OS-bypass, zero-copy, one-sided and asynchronous operations.
+
+\emph{OS-bypass} allows direct interaction between the application and 
+a virtualized instance of the network hardware, without involving the 
+operating system. 
+This technique is essential for low latency, as it removes the need for 
+interrupts in the critical path. Furthermore, a process or a thread blocking 
+in the kernel is often scheduled on a different core when awaken. Avoiding the 
+operating system can greatlty improves NUMA locality. 
+To support OS-bypass, the network adapter must be able to demultiplex incoming 
+packets into corresponding queues in each application. Most of this 
+functionality is commonly used in Ethernet adapters supporting Receive Side 
+Scaling (RSS).
+
+\emph{Zero-copy} reduces CPU overhead and increase bandwidth by eliminating 
+memory copies in the critical path. The network adapter fetches or delivers 
+data directly into the memory space of the application via Direct Memory Access 
+(DMA) operations. To this end, the related memory pages must be pinned so 
+that the network adapter can safely access it. 
+An important drawback of zero-copy is its synchronous nature. Since there is 
+no intermediate copies, the memory on the send side cannot be reused until 
+the data has safely been delivered on the receive side (or at least put on 
+the wire for unreliable connections).
+
+Zero-copy is often confused with \emph{one-sided operations}, which allow a 
+communication to completed without the involvement of the application thread 
+on the remote side. All of the required information, mainly the remote address 
+of the data to acess, is provided on the origin side. One-sided operations 
+may or may not be associated with zero-copy, and may use the help of a 
+progression thread on the target side. Similarly, zero-copy may be implemented 
+with receive matching instead or remote addressing, as it is the case with MX 
+and Portals.
+
+\emph{Asynchronous operations} are used to decouple the initiation of a 
+communication from its completion. They allow the cost of communication to be 
+overlapped with computation. Interestingly, enough computation could completly 
+overlap all communications, possibly making network bandwidth irrelevant. 
+More practically, asynchronous operations allow to initiate concurrent 
+data mouvements without blocking the application thread.
+
+To deliver the best performance, a new communication interface should present
+semantics that can efficiently leverage all this techniques as provided by 
+modern high-speed networks.
 
 \subsection{Scalability}
-Projections for exascale systems include hundreds of thousands of nodes and millions of
-cores\cite{dongarra:exascale-talk-2010}. To maximize scalability, an API must provide
-demultiplexing\note{Patrick, what do you have in mind here?}, use shared resources as much
-as possible, and support NUMA/multicore systems. Resources cannot grow linearly with the
-number of communicating partners.
+Projections for exascale systems in HPC include hundreds of thousands of nodes 
+and millions of cores\cite{dongarra:exascale-talk-2010}. In the commercial 
+space, Cloud Computing datacenters are fast approaching these levels. 
+In this context, scalability is an important requirement. The time and space 
+overhead of a scalable communication interface should not grow linearly with 
+the number of communicating partners. Sockets are inefficient in both 
+dimensions, as buffers and file handles are allocated for each new Socket. 
+Through adaptive socket buffers and use of epoll(), Socket implementations 
+have so far managed to reasonably handle large number of connections. 
+MPI is inherently more scalable and it has successfully been deployed on large 
+HPC machines. However, it is not clear if MPI in its present form can 
+efficiently scale to millions of cores. 
+Scalability of the Verbs interface was originally quite poor due to it's Queue 
+Pair model. MPI implementations used various techniques such as connection on 
+demand/note{need reference} and dynamic buffer management/note{need reference} 
+to work around the QPs memory footprint problem. Scalability later improved 
+with the addition of Shared Receive Queues (SRQ), but distinct QPs are still 
+required on the send side. To address the Cloud Computing and Exascale 
+requirement, a new communication interface should aims for constant buffer 
+and polling overhead, independently of the number of nodes in the fabric.
 
 \subsection{Robustness}
-A robust API should include connection-oriented semantics, error recovery, and support for
-unreliable communications including multicast.
+Hardware and software failures occur everywhere, all the time, especially on 
+large systems. Ignoring them is unacceptable. Unfortunately, this is exactely 
+how most MPI implementations handle such errors. There have been several 
+efforts aimed at designing fault-tolerant MPI libraries and add fault recovery 
+to the MPI specification, without success so far. The loose semantic about 
+status completions was actually a benefit in making MPI a simpler interface, 
+developers would send messages and trust MPI to always deliver them. 
+Unfortunately, real-world applications eventually had to implement 
+checkpoint/restart functionality to work around this problem and it is the 
+only practical solution available today on large HPC systems. 
+Both Sockets and Verbs fare better than MPI on this issue. They use connections 
+to represent the state of communication channels. Connections are essential 
+for robustness, they contain faults and allow for their recovery by reseting 
+the state of the affected communication channels. 
+Unfortunately, both Sockets and Verbs associate buffers to connection, which 
+negatively affects scalability. A new communication interface should provide 
+connection-oriented semantics without per-connection resources. 
 
-A new API should not hide the connection handling under the covers like MPI or Portals.
-As with sockets, using connection-oriented semantics is familiar and well understood. We
-do not mean that an implementation must maintain connection state. It is possible that
-some implementations might handle connection state in a kernel driver or in the NIC or not
-require any at all. The idea of requiring the connection-oriented semantics is that a
-\emph{client} connects to a \emph{server} and the server chooses to accept or reject the
-client's request. It is also an opportunity to allow the client to pass credentials to the
-server if authentication and/or authorization is required and it is an opportunity for the
-two sides to negotiate message sizes, the number of messages in flight, and other internal
-information as appropriate.
+Communication reliability is often seen as a way to improve overall robustness. 
+For some applications such as Media Content Delivery (IPTV), Financial Trading 
+(HFT) or system-health monitoring, the provided reliability may be incompatible 
+with their timing requirements. 
+Furthermore, most scalable multicast implementations are unreliable. For these 
+reasons, a large share of applications use unreliable connections. 
+A new communication interface should provide different type of connection, 
+including multicast. 
 
-As systems scale larger, error recovery needs to be simple and well-defined.\note{we need
-more here}
-
-Not all applications require reliable communications such as high-frequency financial
-trading, video delivery, and distributed, system-health monitoring services that want the
-most recent data and cannot wait for retransmission. Given that, an API should provide
-unreliable connections in addition to reliable ones. Support should also be provided for
-unreliable multicast if the hardware supports it.
 
 \section{The CCI Interface}
 In this section, we provide a brief overview of the CCI API to allow us to discuss how CCI
 can meet the goals outlined above. Each function call is prefixed by \texttt{cci\_} which
 we omit below for brevity.
 
-\subsection{Initialization}
-Before calling any function, the application must call \f{init}. The application
-may call init multiple times with different parameters. The application can then call
-\f{get\_devices} to obtain an array of available devices. The devices are parsed
-from a config file and each device has a name, an array keyword/value strings, a maximum
-send size in bytes, and PCI information if needed. Each device's maximum send size is
-equivalent to the network MTU. When no more communication is needed, the application calls
-\f{free\_devices}.
-
-\subsection{Communication Endpoints}
+\subsection{Endpoints}
 All communication in CCI revolves around an endpoint. Each endpoint has some number of
 device-sized buffers available for sending and receiving messages of small, unexpected
 messages. The application calls \f{create\_endpoint} and \f{destroy\_endpoint},
 respectively, to obtain or release an endpoint. The application may alter the number of
 send and/or receive buffers using \f{get\_opt} and \f{set\_opt}.
-
-\subsection{Event Handling}
-CCI is inherently asynchronous and all communication functions only initiate
-communication. When a communication completes, it generates an event. There are three
-event types: SEND, RECV, and OTHER. The OTHER event returns connection success, rejection
-or timeout events as well as endpoint and/or device failure events.
-
-An application can poll for an event with \f{get\_event}, which returns an event structure
-of which the contents vary depending on the event's type. When a process is finished with
-an event, it uses \f{return\_event} to release it resources, if any, back to CCI.
-
-In addition to returning an endpoint, \f{create\_endpoint} also returns an operating
-system-specific handle that can be passed to \f{select} or other OS functions to allow
-blocking until an event is available.
 
 \subsection{Connections}
 CCI defines a \emph{connection} struct which includes the maximum send size negotiated by
@@ -279,6 +377,11 @@ CCI provides multiple types of connection attributes:
 
 If a process needs a mix of types, it is allowed to open multiple connections to the other
 process.
+
+It is also an opportunity to allow the client to pass credentials to the
+server if authentication and/or authorization is required and it is an opportunity for the
+two sides to negotiate message sizes, the number of messages in flight, and other internal
+information as appropriate.
 
 \subsection{Connection Establishment}
 As we previously discussed, part of the robustness of the sockets API is its client/server
@@ -308,6 +411,26 @@ client gets an OTHER event with a type of CONNECT\_TIMEOUT. When a process no lo
 a connection, it can call \f{disconnect}.
 
 \subsection{Active Messages}
+
+\note{Below is mostly Patrick's text from his outline}
+Buffered messages as in sockets provide asynchronism but consume time and 
+space. Asynchronism is fundamental for scalability, but space is bounded and 
+time is precious. 
+Matching interfaces (as used in MPI) are powerful but very complex. The 
+matching semantics (wildcards) may require coherent matching implementation, 
+preventing effective offload (has to be done in the host). Furthermore, 
+matching generally requires support for unexpected messages, which consumes 
+time and space. Finally matching interfaces are stateful, which is bad for 
+fault-tolerance and offload.  Socket's SOCK\_STREAM semantic is akin to 
+ordered matching, all messages demultiplexed to the same destination socket 
+are treated as unexpected messages until consumed.
+
+Active Messages is well known solution but has two problems: async handlers 
+and reassembly of large messages.  Async handlers are unbounded in term of 
+running time. CCI uses events instead.  Messages larger than MTU requires 
+reassembly: means stateful (bad), means unexpected buffers (bad). The solution 
+is to limit message size to MTU, segmentation/reassembly in application.
+
 Once the connection is established, the two processes can start communicating. CCI
 provides two methods, active messages and remote memory access (RMA), which we discuss in
 the next section.
@@ -335,28 +458,6 @@ pointers may be NULL. The header is currently limited to a maximum length of 32 
 context pointer is returned in the SEND completion event and can be used to allow the
 application to retrieve its internal state.
 
-The optional flags parameter can accept the following:
-
-\begin{description}
-\item BLOCKING which means that the send should not return until the send
-completes. The send completion status is passed in the function's return value.
-\item NO\_COPY is a hint to CCI that the application does not need the buffer
-back until the send completes and is free to use zero-copy methods if supported.
-\item SILENT indicates that the process does not want a completion event for this
-send.
-\end{description}
-
-On the receiver, a call to \f{get\_event} returns a RECV event which includes pointers to
-the header and data, their lengths, and a pointer to the connection. The receiving process
-can choose to simply inspect the data in-place, modify the data in-place and send it to
-another process, or copy it out if it needs to keep the data long-term. When the process
-no longer needs the buffer, it releases it back to CCI with \f{return\_event}. It should
-be noted that if the application does not process RECV events and return them to CCI fast
-enough, that CCI may still need to drop incoming messages.
-
-CCI also provides a \f{sendv} function that takes an array of data pointers and an array
-of lengths instead of the just the one data pointer and length in \f{send}. Lastly, CCI
-does not require memory registration for sending or receiving active messages.
 
 \subsection{Remote Memory Access}
 Clearly, messages limited to a single MTU will not meet the needs of all applications.
@@ -412,32 +513,6 @@ CCI does not guarantee delivery order within an operation (i.e. no last-byte-wri
 mandate), but order is guaranteed between data delivery and the remote receive event if
 the header is specified.
 
-\section{How CCI Achieves the Design Goals}
-
-\subsection{Built-in Connection Broker}
-\note{what do we want to say here?}
-
-\subsection{Benefits of CCI's Active Messages}
-
-\note{Below is mostly Patrick's text from his outline}
-Buffered messages as in sockets provide asynchronism but consume time and space.
-Asynchronism is fundamental for scalability, but space is bounded and time is precious.
-Matching interfaces (as used in MPI) are powerful but very complex. The matching semantics
-(wildcards) may require coherent matching implementation, preventing effective offload
-(has to be done in the host). Furthermore, matching generally requires support for
-unexpected messages, which consumes time and space. Finally matching interfaces are
-stateful, which is bad for fault-tolerance and offload.  Socket's SOCK\_STREAM semantic is
-akin to ordered matching, all messages demultiplexed to the same destination socket are
-treated as unexpected messages until consumed.
-
-Active Messages is well known solution but has two problems: async handlers and reassembly
-of large messages.  Async handlers are unbounded in term of running time. CCI uses events
-instead.  Messages larger than MTU requires reassembly: means stateful (bad), means
-unexpected buffers (bad). The solution is to limit message size to MTU,
-segmentation/reassembly in application.
-
-
-\subsection{Benefits of CCI's RMA}
 \note{thoughts?} Explicit memory registration which is missing from MPI.\note{why is this
 good, George?} Simpler semantics and coding compared to Verbs.\note{is this true, Dave?}
 
@@ -463,41 +538,7 @@ processes to the same cores for both tests. The CCI over Portals
 \begin{math}\frac{1}{2}\end{math}RTT was less than 200 ns more than the antive
 Portals' performance, 6.0 $\mu$\textit{s} versus 5.8 us.
 
-\subsection{Simplicity} An example of an application library that supports
-multiple networking APIs is Open-MPI (OMPI). OMPI has support for seven
-networking APIs (ignoring self, shared memory, and the OFA unreliable Datagram
-which is disabled). The total lines of code to implement OMPI's Byte Transfer
-Layer (BTL) for each of the APIs is listed in Table \ref{tab:btl}.
 
-\begin{table}[!t] \centering
-\caption{Lines of Code Per BTL}
-\label{tab:btl}
-\begin{IEEEeqnarraybox}[\IEEEeqnarraystrutmode\IEEEeqnarraystrutsizeadd{2pt}{1pt}]{v/s/v/s/v}
-\IEEEeqnarrayrulerow\\ &\mbox{BTL}&&LOC&\\
-\IEEEeqnarraydblrulerow\\
-\IEEEeqnarrayseprow[3pt]\\ &Elan&&1,656&\IEEEeqnarraystrutsize{0pt}{0pt}\\
-\IEEEeqnarrayseprow[3pt]\\
-\IEEEeqnarrayrulerow\\
-\IEEEeqnarrayseprow[3pt]\\ &MX&&2,333&\IEEEeqnarraystrutsize{0pt}{0pt}\\
-\IEEEeqnarrayseprow[3pt]\\
-\IEEEeqnarrayrulerow\\
-\IEEEeqnarrayseprow[3pt]\\ &Portals&&2,469&\IEEEeqnarraystrutsize{0pt}{0pt}\\
-\IEEEeqnarrayseprow[3pt]\\
-\IEEEeqnarrayrulerow\\
-\IEEEeqnarrayseprow[3pt]\\ &GM&&2,779&\IEEEeqnarraystrutsize{0pt}{0pt}\\
-\IEEEeqnarrayseprow[3pt]\\
-\IEEEeqnarrayrulerow\\
-\IEEEeqnarrayseprow[3pt]\\ &Sockets (TCP)&&4,192&\IEEEeqnarraystrutsize{0pt}{0pt}\\
-\IEEEeqnarrayseprow[3pt]\\
-\IEEEeqnarrayrulerow\\
-\IEEEeqnarrayseprow[3pt]\\ &UDAPL&&6,208&\IEEEeqnarraystrutsize{0pt}{0pt}\\
-\IEEEeqnarrayseprow[3pt]\\
-\IEEEeqnarrayrulerow\\
-\IEEEeqnarrayseprow[3pt]\\ &OpenIB (Verbs)&&13,994&\IEEEeqnarraystrutsize{0pt}{0pt}\\
-\IEEEeqnarrayseprow[3pt]\\
-\IEEEeqnarrayrulerow
-\end{IEEEeqnarraybox}
-\end{table}
 
 Given the authors work with MX, GM, sockets, and Portals, we expect that a BTL
 implementation using CCI would be smaller than MX and hopefully smaller than
