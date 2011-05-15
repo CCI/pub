@@ -120,7 +120,7 @@ modern high-speed networks.
 \subsection{Scalability}
 Projections for exascale systems in HPC include hundreds of thousands of nodes 
 and millions of cores\cite{dongarra:exascale-talk-2010}. In the commercial 
-space, Cloud Computing datacenters are fast approaching these levels. 
+space, Cloud Computing data centers are fast approaching these levels. 
 In this context, scalability is an important requirement. The time and space 
 overhead of a scalable communication interface should not grow linearly with 
 the number of communicating partners. Sockets are inefficient in both 
@@ -152,7 +152,7 @@ checkpoint/restart functionality to work around this problem and it is the
 only practical solution available today on large HPC systems. 
 Both Sockets and Verbs fare better than MPI on this issue. They use connections 
 to represent the state of communication channels. Connections are essential 
-for robustness, they contain faults and allow for their recovery by reseting 
+for robustness, they contain faults and allow for their recovery by resetting 
 the state of the affected communication channels. 
 Unfortunately, both Sockets and Verbs associate buffers to a connection, which 
 negatively affects scalability. A new communication interface should provide 
@@ -164,6 +164,6 @@ For some applications such as Media Content Delivery (IPTV), Financial Trading
 with their timing requirements. 
 Furthermore, most scalable multicast implementations are unreliable. For these 
 reasons, a large share of applications use unreliable connections. 
-A new communication interface should provide different type of connection, 
-including multicast. 
+A new communication interface should provide different levels of connection 
+reliability, as well as support for multicast. 
 
