@@ -31,6 +31,20 @@ Elan.
 
 \subsection{Performance}
 
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=3.5in]{pingpong-latency.eps}
+\caption{Pingpong Latency when using Portals on SeaStar}
+\label{fig:latency}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=3.5in]{pingpong-bw.eps}
+\caption{Pingpong Bandwidth when using Portals on SeaStar}
+\label{fig:bw}
+\end{figure}
+
 \subsection{Scalability}
 
 For the Portals driver, each connection requires 104 bytes on 64-bit machines
@@ -39,25 +53,4 @@ struct, and 64 bytes for the Portals driver connection struct).  The sock driver
 needs 140 bytes for each connection.
 
 \subsection{Robustness}
-
-%** elan **
-    %1656 total
-%** gm **
-    %2779 total
-%** mx **
-    %2333 total
-%** ofud **
-    %2332 total
-%** openib **
-   %13994 total
-%** portals **
-    %2469 total
-%** self **
-     %985 total
-%** sm **
-    %2189 total
-%** tcp **
-    %4192 total
-%** udapl **
-    %6208 total
 

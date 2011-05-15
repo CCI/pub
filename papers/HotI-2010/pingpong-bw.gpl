@@ -1,0 +1,75 @@
+set terminal postscript eps enhanced color
+
+set output "pingpong-bw.eps"
+
+set title "Pingpong Bandwidth"
+
+set style data lines
+
+set ylabel "MB/s"
+
+set xlabel "Message Size (bytes)"
+
+
+set style line 1 lt 3 lw 4
+set style line 2 lt 1 lw 4
+set style line 3 lt 5 lw 4
+set style line 4 lt 2 lw 4
+set style line 5 lt 4 lw 4
+set style line 6 lt 6 lw 4
+set style line 7 lt -1 lw 4
+set style line 8 lt 7 lw 4
+
+#set key graph 0.4, 0.9     
+set key right bottom
+
+set logscale y
+set logscale x 2
+set xtics (1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192)
+
+# finally the plot command
+plot [1:8192][.1:] "-" with linespoints title "Native Portals" ls 1, "-" with linespoints title "CCI" ls 2, "-" with linespoints title "MPI" ls 3
+1	0.17
+2	0.35
+4	0.70
+8	1.39
+16	2.78
+32	3.06
+64	6.15
+128	12.30
+256	24.59
+512	49.09
+1024	97.90
+2048	189.45
+4096	344.20
+8192	606.81
+e
+1	0.17
+2	0.34
+4	0.68
+8	1.35
+16	2.70
+32	3.05
+64	6.08
+128	12.11
+256	24.15
+512	48.03
+1024	95.52
+2048	184.01
+4096	348.00
+8192	594.05
+e
+1	0.14
+2	0.29
+4	0.56
+8	1.09
+16	2.19
+32	2.65
+64	5.39
+128	10.09
+256	20.95
+512	41.42
+1024	79.07
+2048	147.02
+4096	271.44
+8192	430.03

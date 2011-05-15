@@ -1,0 +1,77 @@
+set terminal postscript eps enhanced color
+
+set output "pingpong-latency.eps"
+
+set title "Pingpong Latency (1/2 RTT)"
+
+set style data lines
+
+set ylabel "Time [{/Symbol m}s]"
+
+set xlabel "Message Size (bytes)"
+
+
+set style line 1 lt 3 lw 4
+set style line 2 lt 1 lw 4
+set style line 3 lt 5 lw 4
+set style line 4 lt 2 lw 4
+set style line 5 lt 4 lw 4
+set style line 6 lt 6 lw 4
+set style line 7 lt -1 lw 4
+set style line 8 lt 7 lw 4
+
+#set key graph 0.4, 0.9     
+set key right bottom
+
+set logscale x 2
+set xtics (1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192)
+
+# finally the plot command
+plot [1:8192][0:] "-" with linespoints title "Native Portals" ls 1, "-" with linespoints title "CCI" ls 2, "-" with linespoints title "MPI" ls 3
+#0      5.65
+1      5.74
+2      5.74
+4      5.74
+8      5.74
+16     5.76
+32     10.46
+64     10.41
+128    10.41
+256    10.41
+512    10.43
+1024   10.46
+2048   10.81
+4096   11.90
+8192   13.50
+e
+#0      5.88
+1      5.90
+2      5.91
+4      5.91
+8      5.91
+16     5.92
+32     10.49
+64     10.53
+128    10.57
+256    10.60
+512    10.66
+1024   10.72
+2048   11.13
+4096   11.77
+8192   13.79
+e
+#0      6.62
+1      7.27
+2      7.01
+4      7.10
+8      7.32
+16     7.29
+32     12.08
+64     11.88
+128    12.69
+256    12.22
+512    12.36
+1024   12.95
+2048   13.93
+4096   15.09
+8192   19.05
