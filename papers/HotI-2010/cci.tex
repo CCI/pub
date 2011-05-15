@@ -181,7 +181,7 @@ in mind: portability, simplicity, performance, scalability, and robustness.
 Application and middleware developers do not have the resources to continuously 
 port their code on different communication interfaces. 
 Selecting a vendor-specific API reduces competition in the market place, thus 
-increasing prices and the risks of business failure or market disruptions. It 
+increasing prices and adding the risk of business failure or market disruptions. It 
 also slows down the adoption of new and improved technology. 
 Similarly, vendors do not have the resources to properly support a large set 
 of middlewares. The whole ecosystem would clearly benefit from a truly unified 
@@ -193,19 +193,19 @@ currently available hardware, by supporting the semantics that are common
 to most vendor APIs.
 
 \subsection{Simplicity}
-Simplicity is paramount to the success of a programing interface. Critical 
-mass cannot be reached by limitting the targeted audience to few networking 
+Simplicity is paramount to the success of a programming interface. Critical 
+mass cannot be reached by limiting the targeted audience to a few networking 
 experts. However, ease of use involves many elements beyond just expertise. 
-Code size is a common albeit subjective metric used to compare programing 
+Code size is a common, albeit subjective, metric used to compare programming 
 interfaces. The rationale is that larger codes are harder to debug and 
 maintain. For example, an analysis of the OpenMPI implementation shows great 
-differences between the 7 supported communication APIs (excluding self and 
+differences between the seven supported communication APIs (excluding self and 
 shared memory). The total lines of code of each Byte Transfer Layer (BTL) is 
 listed in Table \ref{tab:btl}. The Verbs BTL is the largest, triple the size 
 of the Sockets BTL, second largest, and 5 to 6 times larger than the BTLs of 
 vendor interfaces. 
 
-\begin{table}[!t] \centering
+\begin{table}[htbp] \centering
 \caption{Lines of Code per BTL}
 \label{tab:btl}
 \begin{IEEEeqnarraybox}[\IEEEeqnarraystrutmode\IEEEeqnarraystrutsizeadd{2pt}{1pt}]{v/s/v/s/v}
@@ -236,7 +236,7 @@ vendor interfaces.
 \end{table}
 
 Another indicator of complexity is the number of functions available. Choice 
-is good but too much choice is worse. Fortunately, software programers are 
+is good but too much choice is worse. Fortunately, software programmers are 
 efficient at reducing overly complex interfaces to a minimum set of useful 
 semantics.
 For example, MPI specifies over 200 functions but the vast majority of MPI 
@@ -248,21 +248,21 @@ between richness of semantics and ease of use.
 \subsection{Performance}
 Performance is major drive for innovation in networking, as much in HPC as 
 in Cloud Computing. All modern network technologies leverage common techniques 
-developped in the last two decades: OS-bypass, zero-copy, one-sided and asynchronous operations.
+developed in the last two decades: OS-bypass, zero-copy, one-sided and asynchronous operations.
 
 \emph{OS-bypass} allows direct interaction between the application and 
 a virtualized instance of the network hardware, without involving the 
 operating system. 
 This technique is essential for low latency, as it removes the need for 
 interrupts in the critical path. Furthermore, a process or a thread blocking 
-in the kernel is often scheduled on a different core when awaken. Avoiding the 
-operating system can greatlty improves NUMA locality. 
+in the kernel is often scheduled on a different core when awakened. Avoiding the 
+operating system can greatly improves NUMA locality. 
 To support OS-bypass, the network adapter must be able to demultiplex incoming 
 packets into corresponding queues in each application. Most of this 
-functionality is commonly used in Ethernet adapters supporting Receive Side 
+functionality is commonly used in Ethernet adapters that support Receive Side 
 Scaling (RSS).
 
-\emph{Zero-copy} reduces CPU overhead and increase bandwidth by eliminating 
+\emph{Zero-copy} reduces CPU overhead and increases bandwidth by eliminating 
 memory copies in the critical path. The network adapter fetches or delivers 
 data directly into the memory space of the application via Direct Memory Access 
 (DMA) operations. To this end, the related memory pages must be pinned so 
@@ -275,7 +275,7 @@ the wire for unreliable connections).
 Zero-copy is often confused with \emph{one-sided operations}, which allow a 
 communication to completed without the involvement of the application thread 
 on the remote side. All of the required information, mainly the remote address 
-of the data to acess, is provided on the origin side. One-sided operations 
+of the data to access, is provided on the origin side. One-sided operations 
 may or may not be associated with zero-copy, and may use the help of a 
 progression thread on the target side. Similarly, zero-copy may be implemented 
 with receive matching instead or remote addressing, as it is the case with MX 
@@ -283,13 +283,13 @@ and Portals.
 
 \emph{Asynchronous operations} are used to decouple the initiation of a 
 communication from its completion. They allow the cost of communication to be 
-overlapped with computation. Interestingly, enough computation could completly 
+overlapped with computation. Interestingly, enough computation could completely 
 overlap all communications, possibly making network bandwidth irrelevant. 
 More practically, asynchronous operations allow to initiate concurrent 
-data mouvements without blocking the application thread.
+data movements without blocking the application thread.
 
 To deliver the best performance, a new communication interface should present
-semantics that can efficiently leverage all this techniques as provided by 
+semantics that can efficiently leverage all these techniques as provided by 
 modern high-speed networks.
 
 \subsection{Scalability}
@@ -307,16 +307,16 @@ HPC machines. However, it is not clear if MPI in its present form can
 efficiently scale to millions of cores. 
 Scalability of the Verbs interface was originally quite poor due to it's Queue 
 Pair model. MPI implementations used various techniques such as connection on 
-demand/note{need reference} and dynamic buffer management/note{need reference} 
+demand\cite{connect-on-demand} and dynamic buffer management\cite{dynamic-buffer} 
 to work around the QPs memory footprint problem. Scalability later improved 
 with the addition of Shared Receive Queues (SRQ), but distinct QPs are still 
 required on the send side. To address the Cloud Computing and Exascale 
-requirement, a new communication interface should aims for constant buffer 
+requirements, a new communication interface should aim for constant buffer 
 and polling overhead, independently of the number of nodes in the fabric.
 
 \subsection{Robustness}
 Hardware and software failures occur everywhere, all the time, especially on 
-large systems. Ignoring them is unacceptable. Unfortunately, this is exactely 
+large systems. Ignoring them is unacceptable. Unfortunately, this is exactly 
 how most MPI implementations handle such errors. There have been several 
 efforts aimed at designing fault-tolerant MPI libraries and add fault recovery 
 to the MPI specification, without success so far. The loose semantic about 
@@ -329,7 +329,7 @@ Both Sockets and Verbs fare better than MPI on this issue. They use connections
 to represent the state of communication channels. Connections are essential 
 for robustness, they contain faults and allow for their recovery by reseting 
 the state of the affected communication channels. 
-Unfortunately, both Sockets and Verbs associate buffers to connection, which 
+Unfortunately, both Sockets and Verbs associate buffers to a connection, which 
 negatively affects scalability. A new communication interface should provide 
 connection-oriented semantics without per-connection resources. 
 
