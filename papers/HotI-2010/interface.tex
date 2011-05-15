@@ -1,16 +1,46 @@
 \section{The CCI Interface}
-In this section, we provide a brief overview of the CCI API to allow us to discuss how CCI
-can meet the goals outlined above. Each function call is prefixed by \texttt{cci\_} which
-we omit below for brevity.
 
 \subsection{Endpoints}
-All communication in CCI revolves around an endpoint. Each endpoint has some number of
-device-sized buffers available for sending and receiving messages of small, unexpected
-messages. The application calls \f{create\_endpoint} and \f{destroy\_endpoint},
-respectively, to obtain or release an endpoint. The application may alter the number of
-send and/or receive buffers using \f{get\_opt} and \f{set\_opt}.
+An endpoint is a virtualized instance of a device, it is the logical source 
+or destination of all communications in CCI. An endpoint contains both a send 
+and receive queue and their associated buffers, it is a complete container 
+of all resources used by an application process or thread to perform CCI 
+operations. As such, endpoints naturally fit the NUMA architecture, they can 
+be bound to particular cores to maximize locality.
+
+Endpoints interact with the application through events. CCI provides a 
+function to immediately return the next event for a particular endpoint. 
+Optionally, this function can block if no events are available, allowing the 
+application thread to be scheduled out by the operating system. To facilitate 
+the integration of the blocking semantic with non-CCI operations, each endpoint 
+exposes an OS-specific handle such as file descriptor in Linux or an object in 
+Windows.
+
+The concept of endpoint is key to scalability. By multiplexing incoming 
+messages into a shared receive queue and similarly buffering outgoing 
+messages in a shared send queue, the overall memory footprint is independent 
+of the number of peers communicating with the endpoint. On the time dimension, 
+an endpoint offers a unified completion queue, allowing for OS-bypass 
+implementations to provide low latency at scale.
 
 \subsection{Connections}
+CCI uses connections to represent the state of communication channels with 
+remote peers. An endpoint can be connected to another endpoint through one or 
+more connections. Connections have different attributes, such as 
+reliability and order. CCI supports five different connection types:
+
+\begin{itemize}
+\item Reliable with Ordered completion (RO)
+\item Reliable with Unordered completion (RU)
+\item Unreliable with Unordered completion (UU)
+\item Multicast Send (MC\_TX)
+\item Multicast Receive (MC\_RX)
+\end{itemize}
+
+As previously stated, unreliable connections are useful for 
+
+
+
 CCI defines a \emph{connection} struct which includes the maximum send size negotiated by
 the two instances of CCI, a pointer to the owning endpoint, and the connection attribute.
 
@@ -19,19 +49,7 @@ Among applications needing reliable delivery, some may need in-order completion 
 traditional SOCK\_STREAM semantics) and others may accept out-of-order completion as long
 as communications are initiated in-order (e.g. MPI point-to-point).
 
-In order to provide applications with the level of service appropriate for their needs,
-CCI provides multiple types of connection attributes:
 
-\begin{itemize}
-\item Reliable with Ordered completion (RO)
-\item Reliable with Unordered completion (RU)
-\item Unreliable with Unordered completion (UU)
-\item Unreliable with Unordered completion with multicast send (UU\_MC\_TX)
-\item Unreliable with Unordered completion with multicast receive (UU\_MC\_RX)
-\end{itemize}
-
-If a process needs a mix of types, it is allowed to open multiple connections to the other
-process.
 
 It is also an opportunity to allow the client to pass credentials to the
 server if authentication and/or authorization is required and it is an opportunity for the
