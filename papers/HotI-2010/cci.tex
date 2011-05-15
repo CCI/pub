@@ -126,10 +126,19 @@ The MPI standard does not define an underlying network protocol and each MPI
 implementation has written its own network abstraction layer (NAL). These NALs typically
 support sockets as well as one or more vendor specific APIs.
 
-MPI is a less mature interface compared to sockets. MPI is more fragile to use than
-sockets. If an application using MPI encounters a communications fault, the application
-typically aborts. Although work has been done on fault-tolerant MPI\cite{ft-mpi, mpi-ft},
-that work has yet to be adopted by the broader HPC community.
+MPI is a less mature technology compared to sockets likely due to its
+relative complexity (over 100 functions), niche market penetration
+(HPC), and relative youth. While MPI semantics are fairly well defined
+by the MPI standard, implementations vary in their compliance to MPI
+semantics and may exhibit differing behavior when the standard is
+silent on a specific semantic. Applications that rely upon the
+semantic embodied in a particular implementation may not be portable
+across other MPI implementations. MPI provides a rigid fault model in
+which a process fault within a communication group imposes failure to
+all processes within that communication group
+(MPI\_ERRORS\_ABORT). Although work has been done on fault-tolerant
+MPI\cite{ft-mpi, mpi-ft}, that work has yet to be adopted by the
+broader HPC community. 
 
 The MPI standard does not specify buffering semantics (i.e. when to use eager versus
 rendezvous mode). It has limited support for one-sided operations due to the lack of
