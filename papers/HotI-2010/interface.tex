@@ -50,8 +50,8 @@ relaxing order at the communication interface level is believed to be
 essential to enable effective technological solutions.
 
 Connections are established through a client-server process similar to 
-Sockets or RDMA-CM\note{needs ref}. However, applications such as 
-Apache\note{needs ref} commonly use a 2-step mechanism where clients 
+Sockets or RDMA-CM\cite{rdma-cm}. However, applications such as 
+Apache\cite{apache} commonly use a 2-step mechanism where clients 
 initially connect to a broker thread, which passes the requests to a 
 different thread for processing. This allow the application to 
 transparently handle requests with multiple processing threads.
@@ -157,7 +157,7 @@ memory area can be registered on multiple CCI connections if needed.
 
 By requiring explicit memory registration, CCI avoids the mistake of MPI 
 where registration is not part of the API. It is performed in the critical 
-path, which lead to various unsafe caching mechanisms~\ref{regcache} 
+path, which lead to various unsafe caching mechanisms~\cite{regcache} 
 (hijacking malloc and other system calls). 
 The virtualization needs are driving new and improved IOMMU functionality 
 that would make memory registration obsolete on compliant hardware. 
@@ -166,7 +166,7 @@ Unfortunately, it is not widely available at this time.
 With portability as an important design goal, the CCI RMA semantic is 
 designed to be efficiently implemented on top of the Active Messages 
 for devices that do not provide zero-copy support in hardware. 
-Open-MX\ref{openmx} has demonstrated high bandwidth and low CPU 
+Open-MX\cite{Gog11ParCo} has demonstrated high bandwidth and low CPU 
 overhead when using the Intel IOA/T copy engine to move data between receive 
 buffers of an Ethernet driver in the kernel and an RMA target are in user 
 space.
@@ -188,6 +188,6 @@ enforce order on the target side with regards to all previous RMA operations
 on the connection. This semantic allows for optimizations where RMA packets 
 can use multiple links or take different routes in the fabric and the ordering 
 cost is borne only when needed. This maps well to the Fence semantic of the 
-SHMEM~\ref{shmem} API. With strong order between RDMA operations on a given QP, 
-Verbs cannot easily leverage these bonding and adaptive routing to increase 
+SHMEM~\cite{shmem} API. With strong order between RDMA operations on a given 
+QP, Verbs cannot easily leverage these bonding and adaptive routing to increase 
 effective bandwidth.
