@@ -41,7 +41,7 @@ one-sided operations. For point-to-point communication, MPI provides a variety o
 including blocking and non-blocking, synchronous and asynchronous, as well as \emph{ready}
 mode (only send if a matching receive has been posted).
 
-Multiple implementations exist\cite{ompi_04_pvmmpi_overview, MPICH2_URL, mvapich, intel-mpi, platform-mpi}
+Multiple implementations exist\cite{ompi_04_pvmmpi_overview, Gropp:1996:HPI, Liu:2003:RDMA, intel-mpi, platform-mpi}
 which support multiple operating systems and/or interconnects.  Rather than connections,
 the API uses the notion of communication groups (i.e.  communicators) which include all
 processes (MPI\_COMM\_WORLD) and may be split to include subsets of processes. MPI does
