@@ -1,6 +1,5 @@
 \section{Introduction}
 
-
 With the advent of modern networking and the Transmission Control
 Protocol (TCP) / Unreliable Datagram Protocol (UDP) providing
 connectivity across a diversity of hardware architectures and system
@@ -8,15 +7,15 @@ software stacks, the need for a ubiquitous communication API providing
 application portability has been acute. The widely used sockets API
 has largely fulfilled this role, supporting a variety of underlying
 networking technologies through the TCP/UDP abstraction of the lower
-level interface. Since the standardization of TCP~\cite{tcp-standard}
-in 1974 and UDP~\cite{udp-standard} in 1980 and the socket API that
+level interface. Since the standardization of TCP~\cite{tcp-rfc-675}
+in 1974 and UDP~\cite{udp-rfc-768} in 1980 and the socket API that
 supported these protocols, networking technologies have made
 substantial strides. Early networking technologies supported by
 TCP/UDP such as 10BASE5 Ethernet, Token Ring, and Token Bus
 technologies with multi-millisecond latencies, have been replaced by
 technologies such as 10GBase-SR and Quad Data Rate (QDR) InfiniBand
-(IB), Cray's Gemini, IBM's Torrent, and SGI's NumaLink  with latencies
-as low as 1 usec. 
+(IB), Cray's Gemini, IBM's Torrent, and SGI's NumaLink with latencies
+as low as 1$\mu$s.
 
 Current generation networking technologies provide advanced features
 such as support for remote direct memory access (RDMA), reliable
@@ -28,11 +27,11 @@ network APIs have been proposed, such as the Virtual Interface
 Architecture (VIA), OpenFabrics Verbs, Myrinet eXpress (MX), and the
 Portals API. While adequately exposing the underlying network
 interface's capabilities, none of these network APIs has garnered the
-support from application developers that the Sockets inteface
-has. Two key barriers exist to widespread adoption of many of these
-APIs, simplicity from an application developer perspective, and
-portability (including performance portability) accross a variety of
-networking technologies. 
+support from application developers that the Sockets interface has. Two
+key barriers exist to widespread adoption of many of these APIs,
+simplicity from an application developer perspective, and portability
+(including performance portability) across a variety of networking
+technologies.
 
 Application developers are currently forced to make substantial
 tradeoffs in the selection of an underlying networking API for their
@@ -40,15 +39,14 @@ distributed applications. The use of sockets virtually guarantees
 portability across a wide range of operating environments but may
 substantially limit performance and scalability. The use of a custom
 networking API may satisfy performance and scalability requirements
-but exposes the application to limited portability and may implicity
+but exposes the application to limited portability and may implicitly
 remove flexibility in future infrastructure procurements. As a growing
 number of applications in the area of internet search technologies,
 financial trading and rich media require the scalability and
 performance once reserved for high-performance computing applications,
 the need for an API that addresses both portability and performance is
-accute. 
+acute.
 
- 
 In this paper we proposed a new networking API known as the Common
 Communication Infrastructure (CCI) that balances the needs of
 portability and simplicity while preserving the performance
@@ -56,9 +54,14 @@ capabilities of current and next-generation networking
 technologies. In developing CCI we have drawn upon our prior
 experience with a variety of low-level networking APIs as well as our
 experience in working directly with application developers in the use
-of these APIs. We strive, whereever possible, to adhere to our primary
+of these APIs. We strive, wherever possible, to adhere to our primary
 goal of simplicity in order to foster wide-spread adoption while
 maintaining performance and portability. The remainder of this paper
-is organized as follow ... blah.. 
+is organized as follow. The Section~\ref{sec:state} depicts the
+state-of-the-art of the common messaging API, followed by a section
+describing our designs goals. In Section~\ref{sec:interface} we
+details the CCI entities, endpoints and connections, as well as the
+API. Finally, we present the current implementation performance over
+UDP and Portals low level interfaces, and then conclude the paper.
 
 
