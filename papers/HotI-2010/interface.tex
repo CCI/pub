@@ -133,12 +133,12 @@ provide in-order hardware-based segmentation and reassembly, so they
 can use a larger maximum message size without performance penalty.
 
 If the application desires to send a message larger than the limit, it has 
-to perform segmention and reassembly itself. With a typical MSS in the order 
+to perform segmentation and reassembly itself. With a typical MSS in the order 
 of a page size, the segmentation can effectively pipeline the copy into the 
 send buffers with the packet injection itself. On the receive side, 
 reassembly will require an extra memory copy, unless the application can 
 manipulate the data in place over several non-contiguous receive buffers.
-However, the segmentation/reassembly effor is a clear incentive for the 
+However, the segmentation/reassembly effort is a clear incentive for the 
 application to restrict the Messages semantic in CCI to smaller traffic 
 such as synchronization messages.
 
@@ -147,19 +147,19 @@ For larger data movement, CCI provides a Remote Memory Access (RMA) semantic
 that enables zero-copy for low CPU overhead. RMA operations are one-sided, 
 they are only allowed on reliable connections. 
 
-The application needs to explicitely register memory to be used for RMA 
+The application needs to explicitly register memory to be used for RMA 
 transfers. The memory registration process is specific to each device 
 implementation but it usually consists in pinning the underlying physical 
 pages and make them suitable for DMA operations. In CCI, memory is registered 
 for a particular connection or for all connections. This allow for simpler 
 remote memory protection than the Protection Domains of the Verbs API. A 
-memory area can be registed on multiple CCI connections if needed.
+memory area can be registered on multiple CCI connections if needed.
 
 By requiring explicit memory registration, CCI avoids the mistake of MPI 
 where registration is not part of the API. It is performed in the critical 
 path, which lead to various unsafe caching mechanisms~\ref{regcache} 
 (hijacking malloc and other system calls). 
-The virtualization needs are driving new and improved IOMMU functionalities 
+The virtualization needs are driving new and improved IOMMU functionality 
 that would make memory registration obsolete on compliant hardware. 
 Unfortunately, it is not widely available at this time.
 
@@ -177,17 +177,17 @@ small Active Messages, similar to Verbs' Immediate Data. Contrary to Verbs
 and for performance and portability reasons, CCI does not guarantee delivery 
 order between RMA transfers, or even for data of a single RMA operation. 
 Actually, the InfiniBand Verbs does not guarantee Last-Byte-Written-Last 
-semantic as well, but the main IB vendor did and users now assume it. It is 
+semantic as well, but early hardware did and users now assume it. It is 
 very common for Verbs applications to poll on the last byte of a RDMA write 
 on the target side to determine when the RDMA has completed. This behavior is 
 unsafe if the DMA operations are not guaranteed to be delivered in order as 
 it is the case on some systems.
 
 Since RMA order is not guaranteed, a Fence flag can be used to selectively 
-enforce order on the target side with all previous RMA operations on the 
-connection.
-
-...
-
-\note{thoughts?} Explicit memory registration which is missing from MPI.\note{why is this
-good, George?} Simpler semantics and coding compared to Verbs.\note{is this true, Dave?}
+enforce order on the target side with regards to all previous RMA operations 
+on the connection. This semantic allows for optimizations where RMA packets 
+can use multiple links or take different routes in the fabric and the ordering 
+cost is borne only when needed. This maps well to the Fence semantic of the 
+SHMEM~\ref{shmem} API. With strong order between RDMA operations on a given QP, 
+Verbs cannot easily leverage these bonding and adaptive routing to increase 
+effective bandwidth.
