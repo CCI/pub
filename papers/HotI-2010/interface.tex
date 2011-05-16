@@ -90,7 +90,7 @@ this mechanism.
 MPI offers explicitly buffered send but it is rarely used. Instead, the 
 standard send may or may not buffer the message, it returns when 
 the application buffer can be reused. In most implementation, it 
-depends on the message size as explained in section~\ref{sec:mpi}. 
+depends on the message size as explained in Section~\ref{sec:mpi}. 
 Small messages are expected, and sometimes assumed, to be buffered. Larger 
 messages block the send as long as the message is not delivered to the receive 
 side. Unfortunately, this assumed threshold is not defined by the MPI 
