@@ -19,7 +19,7 @@ OTHER_SRC_FILES	= conclusion.tex \
 		evaluation.tex \
 		interface.tex \
 		introduction.tex \
-		state-of-the-art.tex
+		state-of-art.tex
 
 
 
