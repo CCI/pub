@@ -46,7 +46,7 @@ EPS_FILES	=
 # Required commands and options
 
 LATEX		= latex
-PDFLATEX	= pdflatex
+PDFLATEX	= pdflatex -shell-escape
 DVIPS		= dvips
 MAKEINDEX	= makeindex
 BIBTEX		= bibtex
