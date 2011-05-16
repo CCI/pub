@@ -32,7 +32,7 @@ throughput over the network.
 Sockets, when used with SOCK\_STREAM (i.e. TCP), do not scale well since each connection
 requires a separate socket and each socket has its own send and receive buffers.
 
-\subsection{MPI} In the high performance computing (HPC) arena, MPI is the dominant
+\subsection{MPI}\label{sec:mpi} In the high performance computing (HPC) arena, MPI is the dominant
 interface for inter-process communication. Designed for maximum scalability, MPI has a
 richer, but more complicated API.
 
@@ -89,7 +89,7 @@ due to the lack of
 memory registration.\note{Patrick, can you elaborate?}
 
 \subsection{Vendor APIs} There are numberous vendor- and organization-specific APIs
-including Infiniband's Verbs\cite{ofa-verbs}, Cray/Sandia's Portals\cite{portals}, Qlogic's
+including OpenFabrics Verbs\cite{ofa-verbs}, Cray/Sandia's Portals\cite{portals}, Qlogic's
 PSM\cite{psm}, Myricom's MX\cite{mx}, LBL's GASNet\cite{gasnet}, and so on.  Overall, they
 provide a lot of choice, but none is perfect (i.e. none have convinced they others to
 adopt their API).  Since most are targeted to specific hardware, the APIs tend to be more
@@ -99,9 +99,9 @@ complicated.
 \note{reference last year's RoCee paper}
 Here is the cite for the RoCEE paper\cite{RoCEE}.
 
-Based on the earlier VIA specification\cite{via}, the Infiniband standard does not specify
+Based on the earlier VIA specification\cite{via}, the InfiniBand standard does not specify
 an API; it only specifies which \emph{verbs} must be supported. After many vendors created
-separate Verbs APIs, they eventually coalesced into the Open Fabric Association's (OFA)
+separate Verbs APIs, they eventually coalesced into the OpenFabrics Association's (OFA)
 Verbs. OFA's Verbs has had the broadest adoption, yet it still represents less than 43\%
 of the machines on the Top 500\cite{top500} with some, but much less, adoption outside of
 HPC.

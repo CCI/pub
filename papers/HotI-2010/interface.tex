@@ -6,7 +6,7 @@ or destination of all communications in CCI. An endpoint contains both a send
 and receive queue and their associated buffers, it is a complete container 
 of all resources used by an application process or thread to perform CCI 
 operations. As such, endpoints naturally fit the NUMA architecture, they can 
-be bound to particular cores to maximize locality.
+be bound to particular cores to maximize memory locality.
 
 Endpoints interact with the application through events. CCI provides a 
 function to immediately return the next event for a particular endpoint. 
@@ -20,8 +20,8 @@ The concept of endpoint is key to scalability. By multiplexing incoming
 messages into a shared receive queue and similarly buffering outgoing 
 messages in a shared send queue, the overall memory footprint is independent 
 of the number of peers communicating with the endpoint. On the time dimension, 
-an endpoint offers a unified completion queue, allowing for OS-bypass 
-implementations to provide low latency at scale.
+an endpoint offers a unified completion queue for events, allowing for 
+OS-bypass implementations to provide low latency at scale.
 
 \subsection{Connections}
 CCI uses connections to represent the state of communication channels with 
@@ -37,154 +37,157 @@ reliability and order. CCI supports five different connection types:
 \item Multicast Receive (MC\_RX)
 \end{itemize}
 
-As previously stated, unreliable connections are useful for 
+As previously stated, unreliable connections are useful for some applications. 
+Order however is an unusual characteristic, as most network technologies such 
+as Ethernet and InfiniBand assume order on the wire. 
+Nevertheless, there are several situations when unordered semantics are 
+desirable. For example, using multiple network links to increase bandwidth, 
+technique also known as \emph{channel bonding}, naturally does not provide 
+global packet ordering. Similarly, switch contention avoidance techniques, 
+such as adaptive routing, do break order when different routes are selected 
+between two endpoints. Switch contention is a major scalability concern, 
+relaxing order at the communication interface level is believed to be 
+essential to enable effective technological solutions.
 
+Connections are established through a client-server process similar to 
+Sockets or RDMA-CM\note{needs ref}. However, applications such as 
+Apache\note{needs ref} commonly use a 2-step mechanism where clients 
+initially connect to a broker thread, which passes the requests to a 
+different thread for processing. This allow the application to 
+transparently handle requests with multiple processing threads.
+CCI goes a step further and provides a connection manager framework to 
+the application. Clients initiate a connection by specifying a server 
+Uniform Resource Identifier, a string that contains information used 
+by the connection manager to identify the requested service. In the context of 
+HPC, it could be a batch queue system job identifier and a rank. For web 
+services, the URI could be a standard URL. The flexibility of the URI allows 
+for extensibility of naming and support of additional functionality, such as 
+system-wide load-balancing, fail-over, etc.
 
-
-CCI defines a \emph{connection} struct which includes the maximum send size negotiated by
-the two instances of CCI, a pointer to the owning endpoint, and the connection attribute.
-
-As mentioned above, some applications may need reliable delivery while other may not.
-Among applications needing reliable delivery, some may need in-order completion (e.g.
-traditional SOCK\_STREAM semantics) and others may accept out-of-order completion as long
-as communications are initiated in-order (e.g. MPI point-to-point).
-
-
-
-It is also an opportunity to allow the client to pass credentials to the
-server if authentication and/or authorization is required and it is an opportunity for the
-two sides to negotiate message sizes, the number of messages in flight, and other internal
-information as appropriate.
-
-\subsection{Connection Establishment}
-As we previously discussed, part of the robustness of the sockets API is its client/server
-connection semantics. CCI mirrors those semantics. A process willing to accept connections
-will first \f{bind} a device to a name service at a specified \emph{port} and a
-\emph{backlog} parameter. The call returns a pointer to a \emph{service}. When a server no
-longer wishes to receive connection requests, it can \f{unbind} from the service.
-
-To initiate a connection, the client calls \f{connect} with parameters including an
-endpoint, a string URI for the server, the port, optionally a pointer to a limited sized
-payload and its length, the connection attribute, a pointer to an optional application
-context, and a timeout.
-
-The server then polls for connection requests using \f{get\_conn\_request} passing in the
-service pointer. If one is ready, it returns a \emph{conn\_req} struct which contains an
-array of compatible devices, the number of devices in the array, a pointer to the
-application payload and its length if the client sent it, and the requested connection
-attribute.
-
-The server then calls either \f{accept} or \f{reject}. The \f{accept} call binds the
-connection request to an endpoint previously created from one of the compatible devices
-and returns a connection pointer. The client gets an OTHER event with the type
-CONNECT\_SUCCESS. If the server calls \f{reject}, the client get an other event with the
-type CONNECT\_REJECTED.  On the server, the connection request is stale after either call.
-If the server does not reply within the timeout set in the client's \f{connect}, the
-client gets an OTHER event with a type of CONNECT\_TIMEOUT. When a process no longer needs
-a connection, it can call \f{disconnect}.
+On the server side, the application binds to a service and receive 
+connection requests independently of any endpoint. The incoming connection 
+request carry a payload that can be used for identification or authentication. 
+Upon accepting the request, an endpoint is selected to completed the 
+connection. This indirection allows the application to choose a local endpoint 
+at the last step of the connection process, effectively managing multiple 
+endpoints on multi-core systems.
 
 \subsection{Active Messages}
+Buffering is the most efficient way to provide asynchronous semantics, which 
+is essential for scalability. Sockets exclusively relies on buffering on both 
+send and receive sides, a Sockets sends return as soon as the data has been 
+written to the socket send buffer. Similarly, incoming payload is first 
+written to the socket receive buffer and then retrieved by the application.
 
-\note{Below is mostly Patrick's text from his outline}
-Buffered messages as in sockets provide asynchronism but consume time and 
-space. Asynchronism is fundamental for scalability, but space is bounded and 
-time is precious. 
-Matching interfaces (as used in MPI) are powerful but very complex. The 
-matching semantics (wildcards) may require coherent matching implementation, 
-preventing effective offload (has to be done in the host). Furthermore, 
-matching generally requires support for unexpected messages, which consumes 
-time and space. Finally matching interfaces are stateful, which is bad for 
-fault-tolerance and offload.  Socket's SOCK\_STREAM semantic is akin to 
-ordered matching, all messages demultiplexed to the same destination socket 
-are treated as unexpected messages until consumed.
+The Verbs interface provides asynchronous semantics through its send/recv 
+operations. However, it delegates the buffer allocation to the application. 
+Receive buffers have to be posted on a Queue Pair prior to messages arrival 
+and they are matched in order, so they all have to be large enough for the 
+biggest possible messages when using a Shared Receive Queue (SRQ). 
+This put a practical limit to the maximum size of messages exchanged with 
+this mechanism.
 
-Active Messages is well known solution but has two problems: async handlers 
-and reassembly of large messages.  Async handlers are unbounded in term of 
-running time. CCI uses events instead.  Messages larger than MTU requires 
-reassembly: means stateful (bad), means unexpected buffers (bad). The solution 
-is to limit message size to MTU, segmentation/reassembly in application.
+MPI offers explicitly buffered send but it is rarely used. Instead, the 
+standard send may or may not buffer the message, it returns when 
+the application buffer can be reused. In most implementation, it 
+depends on the message size as explained in Section~\ref{sec:mpi}. 
+Small messages are expected, and sometimes assumed, to be buffered. Larger 
+messages block the send as long as the message is not delivered to the receive 
+side. Unfortunately, this assumed threshold is not defined by the MPI 
+specification, it often results in unsafe code that can deadlock, breaking 
+portability. 
+The matching interface in MPI is very powerful but very complex. Support 
+for wild cards require a single, coherent matching stack which cannot be 
+offloaded to effectively handle intra-node messages. In addition, matching 
+interfaces are stateful, which is greatly complicates fault recovery.
 
-Once the connection is established, the two processes can start communicating. CCI
-provides two methods, active messages and remote memory access (RMA), which we discuss in
-the next section.
+CCI uses a variations of Active Messages~\cite{voneicken-isca92} (AM) 
+to address these issues. 
+Most of AM's complexity, shared by GasNet\cite{gasnet}, is related 
+to the use of asynchronous handlers. CCI uses events instead to greatly 
+simplify the API. As the original AM implementation, buffers are managed 
+internally from a constant pool, on both send and receive sides. 
+On the receive side, the application is given access to a CCI buffer through 
+a receive event. It may process the data in place or copy it out. When the 
+application returns the receive event to the CCI library, the corresponding 
+receive buffer is recycled. Receive events can be returned out of order, so 
+the application can keep some receive buffers for some time if necessary. 
+On the send side, messages are immediately buffered.
 
-CCI's version of active messages does not fully mirror Active Messages\cite{voneicken-isca92} (AM). Like
-the original AM, CCI's active messages have a maximum size that is device dependent.
-Ideally, the size is equal to the link MTU (less wire headers). The driving idea to
-limiting the message size to a single MTU is that future networks may have many paths
-through the network due to fabrics with high-radix switches and/or NICs with multiple
-ports connected to redundant switches for fault-tolerance.  Limiting the active message
-size limited to a single MTU vastly simplifies the requirements for message completion ---
-either it arrives or it does not.
+As with Verbs, the receive buffers have to be large enough for the largest 
+message. As the buffer management is removed from the application, CCI 
+explicitly defines a Maximum Message Size (MMS), specified by the underlying  
+device. This well-defined limit avoids the portability and unsafe assumption 
+of the MPI model. However, this maximum message size may be different for 
+different devices, therefore for different endpoints. When two endpoints 
+connect, the smallest MSS is used for that particular connection.
 
-Where CCI differs from the original Active Messages is handling of incoming messages.  In
-Active Messages, the message contains an address of the handler that will process it,
-which assumes all processes have identical memory spaces.  The difficulty with invoking
-handlers is there is no bound on how long the handler will run.  While running, the
-communication library cannot process any more messages and could lead to dropping
-messages. Instead, CCI returns an event of type RECV. The application can get the event
-and hold it without blocking CCI from continuing to service other communications.
+This model is particularly efficient when the MMS aligns with the Maximum 
+Transfer Unit (MTU) of the underlying device, typically 2K to 8K. 
+In this case, no inter-packet state is needed, which greatly simplify 
+networking hardware requirements and allow CCI to leverage less 
+sophisticated devices such as commodity Ethernet adapters. 
+Some HPC networks use a very small MTU, such as 256 Bytes for 
+IBM's BluGene\note{need ref}. Such networks most likely 
+provide in-order hardware-based segmentation and reassembly, so they 
+can use a larger maximum message size without performance penalty.
 
-The \f{send} parameters include the connection, header and data pointers and their
-respective lengths, an application context pointer, and flags. Either or both of the
-pointers may be NULL. The header is currently limited to a maximum length of 32 bytes. The
-context pointer is returned in the SEND completion event and can be used to allow the
-application to retrieve its internal state.
-
+If the application desires to send a message larger than the limit, it has 
+to perform segmention and reassembly itself. With a typical MSS in the order 
+of a page size, the segmentation can effectively pipeline the copy into the 
+send buffers with the packet injection itself. On the receive side, 
+reassembly will require an extra memory copy, unless the application can 
+manipulate the data in place over several non-contiguous receive buffers.
+However, the segmentation/reassembly effor is a clear incentive for the 
+application to restrict the Messages semantic in CCI to smaller traffic 
+such as synchronization messages.
 
 \subsection{Remote Memory Access}
-Clearly, messages limited to a single MTU will not meet the needs of all applications.
-Applications such as file systems which need to move large, bulk messages need much more.
-To accommodate them, CCI also provides remote memory access (RMA). RMA transfers are only
-allowed on reliable connections.
+For larger data movement, CCI provides a Remote Memory Access (RMA) semantic 
+that enables zero-copy for low CPU overhead. RMA operations are one-sided, 
+they are only allowed on reliable connections. 
 
-Before using RMA, the process needs to explicitly register the memory. CCI provides
-\f{rma\_register} which takes pointers to the endpoint, the connection, and the start of
-the region to be registered as well as the length of the region and it returns a RMA
-handle. If the connection pointer is set, RMA operations on that handle will be limited to
-that one connection. If the connection is NULL, then RMA operations on that handle will be
-limited to any connection on that endpoint.  When a process no longer needs to RMA in to
-or out of the region, it passes the handle to \f{rma\_deregister}.
+The application needs to explicitely register memory to be used for RMA 
+transfers. The memory registration process is specific to each device 
+implementation but it usually consists in pinning the underlying physical 
+pages and make them suitable for DMA operations. In CCI, memory is registered 
+for a particular connection or for all connections. This allow for simpler 
+remote memory protection than the Protection Domains of the Verbs API. A 
+memory area can be registed on multiple CCI connections if needed.
 
-For a RMA transfer to take place, both processes must register their local memory and they
-need to pass the handle of the target process to the initiator process using one or more
-active messages. The full \f{rma} signature is:
+By requiring explicit memory registration, CCI avoids the mistake of MPI 
+where registration is not part of the API. It is performed in the critical 
+path, which lead to various unsafe caching mechanisms~\ref{regcache} 
+(hijacking malloc and other system calls). 
+The virtualization needs are driving new and improved IOMMU functionalities 
+that would make memory registration obsolete on compliant hardware. 
+Unfortunately, it is not widely available at this time.
 
-\begin{verbatim}
-int rma(cci_connection_t *connection,
-        void *header_ptr,
-        uint32_t header_len,
-        uint64_t local_handle,
-        uint64_t local_offset,
-        uint64_t remote_handle,
-        uint64_t remote_offset,
-        uint64_t data_len,
-        void *context,
-        int flags);
-\end{verbatim}
+With portability as an important design goal, the CCI RMA semantic is 
+designed to be efficiently implemented on top of the Active Messages 
+for devices that do not provide zero-copy support in hardware. 
+Open-MX\ref{openmx} has demonstrated high bandwidth and low CPU 
+overhead when using the Intel IOA/T copy engine to move data between receive 
+buffers of an Ethernet driver in the kernel and an RMA target are in user 
+space.
 
-The call takes the connection pointer, an optional header pointer and length, the local
-RMA handle and offset, the remote RMA handle and offset, the transfer length, an
-application context pointer, and a set of flags.
+Memory registration produces an handle which has to be communicated to the 
+remote side using Active Messages. RMA operations can optionally include a 
+small Active Messages, similar to Verbs' Immediate Data. Contrary to Verbs 
+and for performance and portability reasons, CCI does not guarantee delivery 
+order between RMA transfers, or even for data of a single RMA operation. 
+Actually, the InfiniBand Verbs does not guarantee Last-Byte-Written-Last 
+semantic as well, but the main IB vendor did and users now assume it. It is 
+very common for Verbs applications to poll on the last byte of a RDMA write 
+on the target side to determine when the RDMA has completed. This behavior is 
+unsafe if the DMA operations are not guaranteed to be delivered in order as 
+it is the case on some systems.
 
-If the header pointer and length are set, the initiator will send a completion message to
-the target that arrives as an active message with the header set and no data payload. Like
-with \f{send}, the header length is limited to 32 bytes.
+Since RMA order is not guaranteed, a Fence flag can be used to selectively 
+enforce order on the target side with all previous RMA operations on the 
+connection.
 
-The flag options include:
-
-\begin{description}
-\item BLOCKING (see \f{send})
-\item SILENT (see \f{send})
-\item READ allows data to move from remote to local memory.
-\item WRITE allows data to move from local to remote memory.
-\item FENCE means wait for all previous RMA operations to complete before performing this
-operation and all following RMA operations.
-\end{description}
-
-CCI does not guarantee delivery order within an operation (i.e. no last-byte-written-last
-mandate), but order is guaranteed between data delivery and the remote receive event if
-the header is specified.
+...
 
 \note{thoughts?} Explicit memory registration which is missing from MPI.\note{why is this
 good, George?} Simpler semantics and coding compared to Verbs.\note{is this true, Dave?}
