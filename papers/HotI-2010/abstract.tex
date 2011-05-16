@@ -1,26 +1,11 @@
 \begin{abstract}
-  Striving for performance or portability, complexity or simplicity,
-  multiple APIs for exchanging data between peers are available
-  today. While each of them has interesting and unique features,
-  developers using them to build more complex software
-  infrastructures, found points where the API failed to
-  deliver critical features required in today's complex software
-  development environment. 
+There are many user-level network APIs for connecting and exchanging data between peers.  
+Each API varies widely when evaluating them based on metrics including (but not limited to) performance, portability, and complexity.
+Specifically, many APIs make design or implementation choices that end up emphasizing some or the more desirable metrics (e.g., performance) while sacrificing others (e.g., portability).
+As a direct result, software developers striving to build large, network-based applications end up having to choose which network API to use based on a complex, multi-dimensional set of criteria -- but still inevitably end up with an API that fails to deliver features in at least some desirable metrics.
 
-  In this paper we introduce a novel API, based on features already
-  available on other communication API, which expose a minimalistic
-  interface while allowing the upper levels to take advantage of a
-  significant number of features. We based the proposed API on
-  requirements from our diverse backgrounds, thriving to keep the high
-  level complexity at a minimum. In this paper we prove that
-  portability, and simplicity at the API level, while providing
-  scalability and robustness are features that can be provided by a
-  communication library with a minimal impact on the performance of
-  the underlying communication protocol. As such, we expect such an
-  interface to facilitate the development of new network hardware,
-  minimize the overhead imposed on the host operating system while
-  allowing application and library developers to reach two of the
-  most challenging requirement for the dynamic distributed tomorrow's
-  applications: minimize the latency and maximize the bandwidth.
-
+In this paper, we introduce a novel API that both supports many features that have become standard (or otherwise generally expected) in other communication APIs, and strives to export a small, simplistic, yet powerful, interface.
+The interfaces in this new API draw upon years of networking diverse networking research spanning from theories of developer best practices to systems-level implementation algorithms.
+The goal was to create a relatively simple, high-level communications API -- one that might even feel somewhat ``familiar'' to developers because of its roots in many other, existing network APIs -- that still provides important features such as scalability, resiliency, and performance.
+The result is the Common Communications Infrastructure (CCI) API: an API that is simple enough to implement in hardware, explicitly designed to incur minimal overhead from a host operating system, and performant enough to meet the needs of network-intensive applications.
 \end{abstract}
