@@ -88,11 +88,14 @@ in the MPI\_2 standard\cite{geist96:_mpi2_lyon}.
 due to the lack of
 memory registration.\note{Patrick, can you elaborate?}
 
-\subsection{Vendor APIs} There are numberous vendor- and organization-specific APIs
-including OpenFabrics Verbs\cite{ofa-verbs}, Cray/Sandia's Portals\cite{portals}, Qlogic's
-PSM\cite{psm}, Myricom's MX\cite{mx}, LBL's GASNet\cite{gasnet}, and so on.  Overall, they
-provide a lot of choice, but none is perfect (i.e. none have convinced they others to
-adopt their API).  Since most are targeted to specific hardware, the APIs tend to be more
+\subsection{Vendor APIs} There are numerous vendor- and
+organization-specific APIs including OpenFabrics
+Verbs\cite{ofa-verbs}, Cray/Sandia's Portals\cite{portals}, Qlogic's
+PSM\cite{psm}, Myricom's MX\cite{mx}, LBL's GASNet\cite{gasnet},
+LAPI\cite{lapi_a_1998}, DCMF\cite{Kumar:2008:DCM:1375527.1375544} and
+so on.  Overall, they provide a lot of choice, but none is perfect
+(i.e. none have convinced they others to adopt their API).  Since most
+are targeted to specific hardware, the APIs tend to be more
 complicated.
 
 \note{Mention DAPL}.
@@ -128,3 +131,16 @@ buffering for smaller messages and remote direct memory access for larger messag
 are connection-less in that the target does not have to accept.  Both provide reliable,
 in-order matching, but out-of-order completion.
 
+LAPI\cite{lapi_a_1998} and DCMF\cite{Kumar:2008:DCM:1375527.1375544}
+are both proprietary software stack developed by IBM, using as target
+the RS-series and lately the BG P/Q IBM machines. While some support
+from the scientific community outside IBM existed, it failed to
+broaden and remains limited to few places. DCMF do support an
+interface for one-sided and two-sided message semantic, with
+contiguous or not memory layout, dealing with multiple [identical]
+interconnects seamlessly. The DCMF communication layer supports in
+addition to MPI, multiple programming paradigms such as Aggregate
+Remote Memory Copy Interface (ARMCI) and Global Arrays (GA). It
+provides in addition to the point-to-point interface, a collective
+API, allowing processes to execute asynchronous collective
+communications in an optimized way.
