@@ -28,6 +28,12 @@ Given the authors work with MX, GM, sockets, and Portals, we expect that a BTL
 implementation using CCI would be smaller than MX and hopefully smaller than
 Elan.
 
+CCI uses connection-oriented semantics with minimal per-connection resources.
+Firgure \ref{memory} shows the connection state (not including buffers) for
+Verb's X-SRQ (single shared receive queue per node and per connection send QP),
+a SOCK\_STREAM socket, and CCI's connection state (assuming 256 bytes due to
+alignment constraints).
+
 \subsection{Portability}
 
 \subsection{Performance}
@@ -44,6 +50,13 @@ Elan.
 \includegraphics[width=3.5in]{pingpong-bw.eps}
 \caption{Pingpong Bandwidth when using Portals on SeaStar}
 \label{fig:bw}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=3.5in]{memory_log.eps}
+\caption{Memory footprint for connections per process}
+\label{fig:memory}
 \end{figure}
 
 \subsection{Scalability}
