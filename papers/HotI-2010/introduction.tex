@@ -28,35 +28,35 @@ network APIs have been proposed, such as the Virtual Interface
 Architecture (VIA), InfiniBand Verbs, Myrinet eXpress (MX), and the
 Portals API. While adequately exposing the underlying network
 interface's capabilities, none of these network APIs has garnered the
-support from application developers that the Sockets interface
+support from application developers that the Sockets inteface
 has. Two key barriers exist to widespread adoption of many of these
 APIs, simplicity from an application developer perspective, and
-portability (including performance portability) across a variety of
+portability (including performance portability) accross a variety of
 networking technologies. 
 
 Application developers are currently forced to make substantial
-trade-offs in the selection of an underlying networking API for their
+tradeoffs in the selection of an underlying networking API for their
 distributed applications. The use of sockets virtually guarantees
 portability across a wide range of operating environments but may
 substantially limit performance and scalability. The use of a custom
 networking API may satisfy performance and scalability requirements
-but exposes the application to limited portability and may implicitly
+but exposes the application to limited portability and may implicity
 remove flexibility in future infrastructure procurements. As a growing
 number of applications in the area of internet search technologies,
 financial trading and rich media require the scalability and
 performance once reserved for high-performance computing applications,
 the need for an API that addresses both portability and performance is
-acute. 
+accute. 
 
  
-In this paper we propose a new networking API known as the Common
+In this paper we proposed a new networking API known as the Common
 Communication Infrastructure (CCI) that balances the needs of
 portability and simplicity while preserving the performance
 capabilities of current and next-generation networking
 technologies. In developing CCI we have drawn upon our prior
 experience with a variety of low-level networking APIs as well as our
 experience in working directly with application developers in the use
-of these APIs. We strive, wherever possible, to adhere to our primary
+of these APIs. We strive, whereever possible, to adhere to our primary
 goal of simplicity in order to foster wide-spread adoption while
 maintaining performance and portability. The remainder of this paper
 is organized as follow ... blah.. 
