@@ -14,7 +14,14 @@ MAIN_TEX	= cci.tex
 # ensure that whenever one of the "other" files changes, "make" will
 # rebuild your paper.
 
-OTHER_SRC_FILES	= 
+OTHER_SRC_FILES	= conclusion.tex \
+		design-goals.tex \
+		evaluation.tex \
+		interface.tex \
+		introduction.tex \
+		state-of-the-art.tex
+
+
 
 # BibTeX sources.  The bibliography will automatically be re-generated
 # if these files change.
