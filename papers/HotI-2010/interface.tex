@@ -39,7 +39,7 @@ reliability and order. CCI supports five different connection types:
 
 As previously stated, unreliable connections are useful for some applications. 
 Order however is an unusual characteristic, as most network technologies such 
-as Ethernet and Infiniband assume order on the wire. 
+as Ethernet and InfiniBand assume order on the wire. 
 Nevertheless, there are several situations when unordered semantics are 
 desirable. For example, using multiple network links to increase bandwidth, 
 technique also known as \emph{channel bonding}, naturally does not provide 
@@ -176,7 +176,7 @@ remote side using Active Messages. RMA operations can optionally include a
 small Active Messages, similar to Verbs' Immediate Data. Contrary to Verbs 
 and for performance and portability reasons, CCI does not guarantee delivery 
 order between RMA transfers, or even for data of a single RMA operation. 
-Actually, the Infiniband Verbs does not guarantee Last-Byte-Written-Last 
+Actually, the InfiniBand Verbs does not guarantee Last-Byte-Written-Last 
 semantic as well, but the main IB vendor did and users now assume it. It is 
 very common for Verbs applications to poll on the last byte of a RDMA write 
 on the target side to determine when the RDMA has completed. This behavior is 
