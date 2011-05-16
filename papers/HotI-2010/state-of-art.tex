@@ -66,7 +66,7 @@ all processes within that communication group
 MPI\cite{fagg04:_fault_toler_commun_librar_applic_high_perof, mpi-ft}, that work has yet to be adopted by the
 broader HPC community. 
 
-The MPI standard does remains silent on a number of areas that are
+The MPI standard remains silent on a number of areas that are
 often performance critical. For basic send/recv operations MPI
 implementations often adopt two common strategies that attempt to
 balance buffering and communication overhead. ``Eager'' mode will send
@@ -82,7 +82,10 @@ particular invocation. Perhaps more importantly, this ambiguity can
 result in receiver buffer overruns or out-of-memory (OOM) faults on
 the receiver. 
 
-It has limited support for one-sided operations due to the lack of
+MPI has limited support for one-sided operations as currently defined
+in the MPI\_2 standard\cite{geist96:_mpi2_lyon}. 
+
+due to the lack of
 memory registration.\note{Patrick, can you elaborate?}
 
 \subsection{Vendor APIs} There are numberous vendor- and organization-specific APIs
@@ -116,7 +119,7 @@ increase the scalability of Verb's based systems.\note{can someone review all of
 The Portals API provides one-sided semantics (i.e.  Put/Get), uses match tags to steer
 messages to the correct buffers. The API is connection-less and leaves it up to the NAL to
 maintain any necessary connection state internally. Portals is mostly used on the large
-Cray systems such as ORNL's Jaguar\cite{jaguar} and LANL's Cielo\cite{cielo}.  The
+Cray systems such as ORNL's Jaguar\cite{jaguar_cug_2010} and LANL's Cielo\cite{cielo}.  The
 Lustre distributed file system NAL, LNET, was originally based on Portals\cite{lnet}.
 
 Both designed for implementing MPI, Myricom's MyrinetExpress (MX) and Qlogic's PathScale
