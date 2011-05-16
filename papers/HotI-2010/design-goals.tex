@@ -132,12 +132,14 @@ HPC machines. However, it is not clear if MPI in its present form can
 efficiently scale to millions of cores. 
 Scalability of the Verbs interface was originally quite poor due to it's Queue 
 Pair model. MPI implementations used various techniques such as connection on 
-demand\cite{connect-on-demand} and dynamic buffer management\cite{dynamic-buffer} 
-to work around the QPs memory footprint problem. Scalability later improved 
-with the addition of Shared Receive Queues (SRQ), but distinct QPs are still 
-required on the send side. To address the Cloud Computing and Exascale 
-requirements, a new communication interface should aim for constant buffer 
-and polling overhead, independently of the number of nodes in the fabric.
+demand\cite{Shipman_infinibandscalability} and dynamic buffer management 
+to work around the QPs memory footprint problem. Scalability later
+improved  with the addition of Shared Receive Queues 
+(SRQ)~\cite{shipman07:_inves_infin}, but distinct QPs are still  
+required on the send side~\cite{Shipman:2008:XIS:1431669.1431683}. To
+address the Cloud Computing and Exascale requirements, a new
+communication interface should aim for constant buffer and polling
+overhead, independently of the number of nodes in the fabric. 
 
 \subsection{Robustness}
 Hardware and software failures occur everywhere, all the time, especially on 
