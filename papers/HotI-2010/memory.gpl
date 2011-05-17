@@ -1,0 +1,47 @@
+set title "Memory Footprint of Connections Per Process"
+set style data points
+set ylabel "MBytes"
+set xlabel "Number of Nodes"
+set term postscript eps color enhanced
+set size .7,.7
+set output "memory.eps"
+set key top left
+qpsize = 4096
+#ep = (1024 * 4096) + (1024 * 4096) + 96
+ep = 0
+xrc(n,ppn,bsrq) = ppn*2 * (n-1) * 4096 / (1024**2)
+cci(n,ppn,unused) = ((n-1) * ppn * 256) / (1024**2)
+socket(n,ppn,unused) = ((n-1) * ppn * 4096 * 2) / (1024**2)
+rc(n,ppn,bsrq) = ppn**2 * bsrq * (n-1) * 4096 / (1024**2)
+plot [t=2:1024] xrc(t,12,1) title "XRC (12 PPN)" w l lt 1 lw 4, \
+                socket(t,12,1) title "Socket (12 PPN)" w l lt 2 lw 4,\
+		cci(t,12,1) title "CCI (12 PPN)" w l lt 3 lw 4
+
+#set key outside
+set key bottom right
+set logscale y
+set output "memory_log.eps"
+replot
+#reset
+#
+#set title "Memory Footprint of Queue Pairs (XSRQ and BSRQ) (8 PPN)"
+#set style data points
+#set ylabel "GBytes"
+#set xlabel "Number of Nodes"
+#set term postscript color enhanced
+#set size .7,.7
+#set output "plot_xsrq.ps"
+#set key top left
+#plot [t=2:1024] rc(t,8,8)/1024 title "RC (8 SRQ)" w l lt 1 lw 4, \
+#                rc(t,8,4)/1024 title "RC (4 SRQ)" w l lt 3 lw 4, \
+#                rc(t,8,2)/1024 title "RC (2 SRQ)" w l lt 5 lw 4, \
+#                rc(t,8,1)/1024 title "RC (1 SRQ)" w l lt 7 lw 4, \
+#                xrc(t,8,8)/1024 title "XRC (8 SRQ)" w l lt 2 lw 4, \
+#                xrc(t,8,4)/1024 title "XRC (4 SRQ)" w l lt 4 lw 4, \
+#                xrc(t,8,2)/1024 title "XRC (2 SRQ)" w l lt 6 lw 4, \
+#                xrc(t,8,1)/1024 title "XRC (1 SRQ)" w l lt 8 lw 4 \
+#
+#set key outside
+#set logscale y
+#set output "plot_xsrq_log.ps"
+#replot
