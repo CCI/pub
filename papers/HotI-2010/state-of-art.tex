@@ -1,8 +1,8 @@
 \section{State of the Art}
 \label{sec:state}
 Over the years, many communication interfaces have come and gone. The few that have
-remained and seen wide-spread adoption are BSD Sockets\cite{Sechrest:CSD-84-191}, the Message Passing
-Interface (MPI)\cite{mpi_forum93:_mpi}, and some vendor-specific application programming interfaces
+remained and seen wide-spread adoption are BSD Sockets~\cite{Sechrest:CSD-84-191}, the Message Passing
+Interface (MPI)~\cite{mpi_forum93:_mpi}, and some vendor-specific application programming interfaces
 (API).
 
 \subsection{Sockets} The Sockets interface is the most widely used by far. All major
@@ -34,7 +34,10 @@ Sockets, when used with SOCK\_STREAM, inherits the well-known TCP
 performance constraints~\cite{Foong03tcpperformance} related to the
 scaling window and the bandwidth delay product. 
 
-\subsection{MPI}\label{sec:mpi} In the High Performance Computing (HPC) arena, MPI is the dominant
+\subsection{MPI}
+\label{sec:mpi} 
+
+In the High Performance Computing (HPC) arena, MPI is the dominant
 interface for inter-process communication. Designed for maximum scalability, MPI has a
 richer, but much more complicated API than Sockets.
 
@@ -43,12 +46,12 @@ one-sided operations. For point-to-point communication, MPI provides a variety o
 including blocking and non-blocking, synchronous and asynchronous, as well as \emph{ready}
 mode (only send if a matching receive has been posted).
 
-Multiple implementations exist\cite{ompi_04_pvmmpi_overview, Gropp:1996:HPI, Liu:2003:RDMA, intel-mpi, platform-mpi}
+Multiple implementations exist~\cite{ompi_04_pvmmpi_overview, Gropp:1996:HPI, Liu:2003:RDMA, intel-mpi, platform-mpi}
 which support multiple operating systems and/or interconnects.  Rather than connections,
 the API uses the notion of communication groups (i.e.  communicators) which include all
-processes (MPI\_COMM\_WORLD) and may be split to include subsets of processes. MPI does
-provide a notion of dynamic process management which includes MPI\_Comm\_accept and
-MPI\_Comm\_connect, but this is less mature and much less used.
+processes ({\sf MPI\_COMM\_WORLD}) and may be split to include subsets of processes. MPI does
+provide a notion of dynamic process management which includes {\sf MPI\_COMM\_ACCEPT} and
+{\sf MPI\_COMM\_CONNECT}, but this is less mature and much less used.
 
 The MPI standard does not define an underlying network protocol and each MPI
 implementation has written its own network abstraction layer (NAL). These NALs typically
@@ -64,8 +67,8 @@ semantic embodied in a particular implementation may not be portable
 across other MPI implementations. MPI provides a rigid fault model in
 which a process fault within a communication group imposes failure to
 all processes within that communication group
-(MPI\_ERRORS\_ABORT). Although work has been done on fault-tolerant
-MPI\cite{fagg04:_fault_toler_commun_librar_applic_high_perof, mpi-ft},
+({\sf MPI\_ERRORS\_ABORT}). Although work has been done on fault-tolerant
+MPI~\cite{fagg04:_fault_toler_commun_librar_applic_high_perof, mpi-ft},
 that work has yet to be adopted by the broader HPC community. 
 
 The MPI standard remains silent on a number of areas that are often
@@ -84,18 +87,18 @@ this ambiguity can result in receiver buffer overruns or out-of-memory
 (OOM) faults on the receiver.
 
 MPI has added support for one-sided operations as currently defined
-in the MPI\_2 standard~\cite{geist96:_mpi2_lyon}. The MPI\_2 one-sided
+in the MPI-2 standard~\cite{geist96:_mpi2_lyon}. The MPI-2 one-sided
 interface has received limited adoption due to API complexity and
 overly constrained semantics~\cite{bonachea-upc-mpi2}. Current efforts
-in the MPI\_3 standardization process are aimed at addressing these
+in the MPI-3 standardization process are aimed at addressing these
 issues. 
 
 
 \subsection{Vendor APIs} There are numerous vendor- and
 organization-specific APIs including OpenFabrics
-Verbs\cite{ofa-verbs}, Cray/Sandia's Portals\cite{portals}, Qlogic's
-PSM\cite{psm}, Myricom's MX\cite{mx}, LBL's GASNet\cite{gasnet},
-LAPI\cite{lapi_a_1998}, DCMF\cite{Kumar:2008:DCM:1375527.1375544} and
+Verbs~\cite{ofa-verbs}, Cray/Sandia's Portals~\cite{portals}, Qlogic's
+PSM~\cite{psm}, Myricom's MX~\cite{mx}, LBL's GASNet~\cite{gasnet},
+LAPI~\cite{lapi_a_1998}, DCMF~\cite{Kumar:2008:DCM:1375527.1375544} and
 so on.  Overall, they provide a lot of choice, but none is perfect
 (i.e. none have convinced they others to adopt their API).  Since most
 are targeted to specific hardware, the APIs tend to be more
@@ -103,13 +106,13 @@ complicated.
 
 \note{Mention DAPL}.
 \note{reference last year's RoCee paper}
-Here is the cite for the RoCEE paper\cite{RoCEE}.
+Here is the cite for the RoCEE paper~\cite{RoCEE}.
 
-Based on the earlier VIA specification\cite{via}, the InfiniBand standard does not specify
+Based on the earlier VIA specification~\cite{via}, the InfiniBand standard does not specify
 an API; it only specifies which \emph{verbs} must be supported. After many vendors created
 separate Verbs APIs, they eventually coalesced into the OpenFabrics Association's (OFA)
 Verbs. OFA's Verbs has had the broadest adoption, yet it still represents less than 43\%
-of the machines on the Top 500\cite{top500} with some, but much less, adoption outside of
+of the machines on the Top 500~\cite{top500} with some, but much less, adoption outside of
 HPC.
 
 Verbs has support for (small) two-sided and one-sided operations. All operations are
@@ -119,14 +122,14 @@ sending. Also, all data movement operations require pinning the memory in advanc
 most common reliable, connection-oriented communication, Verbs requires that the two
 processes establish a queue-pair (QP), which is much more cumbersome than Socket's
 \f{connect} and \f{accept}. Lastly, requiring QPs between all processes has memory scaling
-issues. Work has been done with shared receive queues (SRQ) in MPI\cite{srq} to help
+issues. Work has been done with shared receive queues (SRQ) in MPI~\cite{srq} to help
 increase the scalability of Verb's based systems.\note{can someone review all of this?}
 
 The Portals API provides one-sided semantics (i.e.  Put/Get), uses match tags to steer
 messages to the correct buffers. The API is connection-less and leaves it up to the NAL to
 maintain any necessary connection state internally. Portals is mostly used on the large
-Cray systems such as ORNL's Jaguar\cite{jaguar_cug_2010} and LANL's Cielo\cite{cielo}.  The
-Lustre distributed file system NAL, LNET, was originally based on Portals\cite{lnet}.
+Cray systems such as ORNL's Jaguar~\cite{jaguar_cug_2010} and LANL's Cielo~\cite{cielo}.  The
+Lustre distributed file system NAL, LNET, was originally based on Portals~\cite{lnet}.
 
 Both designed for implementing MPI, Myricom's MyrinetExpress (MX) and Qlogic's PathScale
 Messages (PSM) have many similarities. Both provide a two-sided interface which uses
@@ -134,7 +137,7 @@ buffering for smaller messages and remote direct memory access for larger messag
 are connection-less in that the target does not have to accept.  Both provide reliable,
 in-order matching, but out-of-order completion.
 
-LAPI\cite{lapi_a_1998} and DCMF\cite{Kumar:2008:DCM:1375527.1375544}
+LAPI~\cite{lapi_a_1998} and DCMF~\cite{Kumar:2008:DCM:1375527.1375544}
 are both proprietary software stack developed by IBM, using as target
 the RS-series and lately the BG P/Q IBM machines. While some support
 from the scientific community outside IBM existed, it failed to
