@@ -98,7 +98,7 @@ issues.
 organization-specific APIs available today including OpenFabrics
 Verbs, Cray/Sandia's Portals~\cite{portals}, Qlogic's
 PSM, Myricom's MX, LBL's GASNet~\cite{gasnet}, 
-DAPL~\cite{dapl}, IBM's LAPI~\cite{lapi_a_1998}, IBM's 
+DAPL, IBM's LAPI~\cite{lapi_a_1998}, IBM's 
 DCMF~\cite{Kumar:2008:DCM:1375527.1375544} and so on. 
 Overall, they provide a lot of choice but none has appeared as 
 a widely used communication interface. Since most are targeted to 
@@ -106,7 +106,7 @@ specific network technologies, the APIs tend to reflect the design
 of the underlying hardware. In the rest of this section, we will 
 present each of these interfaces.
 
-Based on the earlier VIA specification~\cite{via}, the InfiniBand~\cite{ibta} standard does not specify
+Based on the earlier VIA specification~\cite{via}, the InfiniBand specification does not specify
 an API; it only specifies which \emph{Verbs} must be supported. After many vendors created
 separate Verbs APIs, they eventually coalesced into the OpenFabrics Association's (OFA)
 Verbs. Verbs has support for two-sided and one-sided operations, always asynchronous. 
