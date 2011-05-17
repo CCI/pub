@@ -12,7 +12,7 @@ provides would not exist without it. The popularity of sockets can be attributed
 \begin{itemize}
 \item Simple API
 \item Robustness
-\item Asynchronous operations
+\item Implicit buffering
 \end{itemize}
 
 The API provides stream and datagram based modes, connection-oriented and connection-less
@@ -24,20 +24,21 @@ operations.
 Sockets implementations are mature and well understood. It does not assume or require
 special hardware features (nor can it exploit them if they exist).
 
-Both sends and receives are buffered allowing operations to complete quickly (if buffer
+Both sends and receives are buffered allowing operations to complete immediately (if buffer
 space is available for sends or data exists in the buffer for receives). Applications may
 also choose to not block if send buffers are full or receive buffers are empty if need be.
 The downside of buffering is more work is required by the CPU which can result in lower
 throughput over the network.
 
-Sockets, when used with SOCK\_STREAM (i.e. TCP), do not scale well since each connection
-requires a separate socket and each socket has its own send and receive buffers.
+Sockets, when used with SOCK\_STREAM, inherits the well-known TCP
+performance constraints~\cite{Foong03tcpperformance} related to the
+scaling window and the bandwidth delay product. 
 
-\subsection{MPI}\label{sec:mpi} In the high performance computing (HPC) arena, MPI is the dominant
+\subsection{MPI}\label{sec:mpi} In the High Performance Computing (HPC) arena, MPI is the dominant
 interface for inter-process communication. Designed for maximum scalability, MPI has a
-richer, but more complicated API.
+richer, but much more complicated API than Sockets.
 
-It provides point-to-point (i.e. send-recv or two-sided semantics), collective, and
+MPI provides point-to-point (i.e. send-recv or two-sided semantics), collective, and
 one-sided operations. For point-to-point communication, MPI provides a variety of modes
 including blocking and non-blocking, synchronous and asynchronous, as well as \emph{ready}
 mode (only send if a matching receive has been posted).
@@ -56,38 +57,39 @@ support sockets as well as one or more vendor specific APIs.
 MPI is a less mature technology compared to sockets likely due to its
 relative complexity (over 100 functions), niche market penetration
 (HPC), and relative youth. While MPI semantics are fairly well defined
-by the MPI standard, implementations vary in their compliance to MPI
-semantics and may exhibit differing behavior when the standard is
+by the MPI standard, implementations vary in their compliance to the
+MPI specification and may exhibit differing behavior when the standard is
 silent on a specific semantic. Applications that rely upon the
 semantic embodied in a particular implementation may not be portable
 across other MPI implementations. MPI provides a rigid fault model in
 which a process fault within a communication group imposes failure to
 all processes within that communication group
 (MPI\_ERRORS\_ABORT). Although work has been done on fault-tolerant
-MPI\cite{fagg04:_fault_toler_commun_librar_applic_high_perof, mpi-ft}, that work has yet to be adopted by the
-broader HPC community. 
+MPI\cite{fagg04:_fault_toler_commun_librar_applic_high_perof, mpi-ft},
+that work has yet to be adopted by the broader HPC community. 
 
-The MPI standard remains silent on a number of areas that are
-often performance critical. For basic send/recv operations MPI
+The MPI standard remains silent on a number of areas that are often
+performance critical. For basic send/recv operations MPI
 implementations often adopt two common strategies that attempt to
 balance buffering and communication overhead. ``Eager'' mode will send
 data immediately to the receiver regardless of the receiver having
 posted a matching receive. The data is buffered on the receiver if the
 matching receive is not posted upon receipt of the
-data. ``Rendezvous'' mode defers sending the data until after a
-matching receive is through the use of a ready-to-send/clear-to-send
-(RTS/CTS) protocol. Performance of an MPI application can therefore be
-largely implementation dependent and may vary even within a single
-implementation depending on the MPI configuration settings used for a
-particular invocation. Perhaps more importantly, this ambiguity can
-result in receiver buffer overruns or out-of-memory (OOM) faults on
-the receiver. 
+data. ``Rendezvous'' mode defers sending the data until a posted
+receive is matched on the receiver. Performance of an MPI application
+can therefore be largely implementation-dependent and may vary even
+within a single implementation depending on the MPI configuration
+settings used for a particular invocation. Perhaps more importantly,
+this ambiguity can result in receiver buffer overruns or out-of-memory
+(OOM) faults on the receiver.
 
-MPI has limited support for one-sided operations as currently defined
-in the MPI\_2 standard~\cite{geist96:_mpi2_lyon}. 
+MPI has added support for one-sided operations as currently defined
+in the MPI\_2 standard~\cite{geist96:_mpi2_lyon}. The MPI\_2 one-sided
+interface has received limited adoption due to API complexity and
+overly constrained semantics~\cite{bonachea-upc-mpi2}. Current efforts
+in the MPI\_3 standardization process are aimed at addressing these
+issues. 
 
-due to the lack of
-memory registration.\note{Patrick, can you elaborate?}
 
 \subsection{Vendor APIs} There are numerous vendor- and
 organization-specific APIs including OpenFabrics
