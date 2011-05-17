@@ -1,47 +1,59 @@
 \section{Introduction}
 \label{sec:introduction}
 
-With the advent of modern networking and the Transmission Control
-Protocol (TCP) / Unreliable Datagram Protocol (UDP) providing
-connectivity across a diversity of hardware architectures and system
-software stacks, the need for a ubiquitous communication API providing
-application portability has been acute. The widely used sockets API
-has largely fulfilled this role, supporting a variety of underlying
-networking technologies through the TCP/UDP abstraction of the lower
-level interface. Since the standardization of TCP~\cite{tcp-rfc-675}
-in 1974 and UDP~\cite{udp-rfc-768} in 1980 and the socket API that
-supported these protocols, networking technologies have made
-substantial strides. Early networking technologies supported by
-TCP/UDP such as 10BASE5 Ethernet, Token Ring, and Token Bus
-technologies with multi-millisecond latencies, have been replaced by
-technologies such as 10GBase-SR and Quad Data Rate (QDR) InfiniBand
-(IB), Cray's Gemini, IBM's Torrent, and SGI's NumaLink with latencies
-as low as 1$\mu$s.
+% JMS s/API/interface/g
+% JMS s/socket/Sockets/g (and sprinkle in ``BSD'')
+
+With the advent of ubiquitous networking and the Internet
+Protocol~\cite{ip-rfc-xxx} 
+% IP is the important part here -- not TCP / UDP.  Not advent or modern.
+Transmission Control Protocol (TCP) / Unreliable Datagram Protocol
+(UDP) providing connectivity across a diversity of hardware
+architectures and system software stacks, the need for a ubiquitous
+communication API providing application portability has been
+acute. The widely used BSD Sockets API has largely fulfilled this
+role, supporting a variety of underlying networking technologies
+through the TCP/UDP abstraction of the lower level interface. Since
+the standardization of TCP~\cite{tcp-rfc-675} in 1974 and
+UDP~\cite{udp-rfc-768} in 1980 and the socket API that supported these
+protocols, networking technologies have made substantial
+strides. Early networking technologies supported by TCP/UDP such as
+10BASE5 Ethernet, Token Ring, and Token Bus technologies with
+multi-millisecond latencies, have been replaced by technologies such
+as 10GBase-SR and Quad Data Rate (QDR) InfiniBand (IB), Cray's Gemini,
+IBM's Torrent, and SGI's NumaLink with latencies as low as 1$\mu$s.
+% move token ring and friends to a parenthetical at the end -- the
+% main point is that it was developed in a slow network
 
 Current generation networking technologies provide advanced features
-such as support for remote direct memory access (RDMA), reliable
-multicast, and cache injection capabilities. While the sockets
-interface supports most of today's advanced networking technologies,
-the stream-based API of sockets obfuscates and often negates the
-benefits of these features. In response, a number of next-generation
-network APIs have been proposed, such as the Virtual Interface
-Architecture (VIA), OpenFabrics Verbs, Myrinet eXpress (MX), and the
-Portals API. While adequately exposing the underlying network
+such as supportf for remote direct memory access (RDMA) OS bypass,
+zero copy, one-sided operations, asynchornous operations,
+% JMS make better
+Sockets interface supports most of today's advanced networking
+technologies, 
+% JMS it's opposite day! ^^
+% sockets provides basic support and t obfuscates other underlying functionality
+the stream-based API of Sockets obfuscates and often
+negates the benefits of these features. In response, a number of
+next-generation network APIs have been proposed, such as the Virtual
+Interface Architecture (VIA), OpenFabrics Verbs, Myrinet eXpress (MX),
+and the Portals API. While adequately exposing the underlying network
 interface's capabilities, none of these network APIs has garnered the
-support from application developers that the Sockets interface has. Two
-key barriers exist to widespread adoption of many of these APIs,
-simplicity from an application developer perspective, and portability
-(including performance portability) across a variety of networking
-technologies.
+support from application developers that the Sockets interface
+has. Two key barriers exist to widespread adoption of many of these
+APIs, simplicity from an application developer perspective, and
+portability (including performance portability) across a variety of
+networking technologies.
 
 Application developers are currently forced to make substantial
 tradeoffs in the selection of an underlying networking API for their
-distributed applications. The use of sockets virtually guarantees
+distributed applications. The use of Sockets virtually guarantees
 portability across a wide range of operating environments but may
 substantially limit performance and scalability. The use of a custom
 networking API may satisfy performance and scalability requirements
 but exposes the application to limited portability and may implicitly
 remove flexibility in future infrastructure procurements. As a growing
+% JMS ``procurement'' is weird here -- vendor/technology lock-in.
 number of applications in the area of internet search technologies,
 cloud computing, financial trading and rich media require the
 scalability and performance once reserved for high-performance
