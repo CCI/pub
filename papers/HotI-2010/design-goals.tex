@@ -11,9 +11,9 @@ Selecting a vendor-specific API reduces competition in the market place, thus
 increasing prices and adding the risk of business failure or market disruptions. It 
 also slows down the adoption of new and improved technology. 
 Similarly, vendors do not have the resources to properly support a large set 
-of middlewares. The whole ecosystem would clearly benefit from a truly unified 
+of middleware. The whole ecosystem would clearly benefit from a truly unified 
 communication layer. 
-BSD Sockets and MPI both provide such a high-level of portability. 
+BSD Sockets and MPI both provide this high-level of portability. 
 For any new communication interface to gain acceptance in the broader 
 community, it needs to provide a similar breadth of implementations on 
 currently available hardware, by supporting the semantics that are common 
@@ -25,7 +25,7 @@ mass cannot be reached by limiting the targeted audience to a few networking
 experts. However, ease of use involves many elements beyond just expertise. 
 Code size is a common, albeit subjective, metric used to compare programming 
 interfaces. The rationale is that larger codes are harder to debug and 
-maintain. For example, an analysis of the OpenMPI implementation shows great 
+maintain. For example, an analysis of the OpenMPI version 1.4.3 implementation shows substantial
 differences between the seven supported communication APIs (excluding self and 
 shared memory). The total lines of code of each Byte Transfer Layer (BTL) is 
 listed in Table \ref{tab:btl}. The Verbs BTL is the largest, triple the size 
@@ -66,25 +66,25 @@ Another indicator of complexity is the number of functions available. Choice
 is good but too much choice is worse. Fortunately, software programmers are 
 efficient at reducing overly complex interfaces to a minimum set of useful 
 semantics.
-For example, MPI specifies over 200 functions but the vast majority of MPI 
+For example, MPI specifies over 300 functions but the vast majority of MPI 
 applications only use a fraction of them. Similarly, relative simplicity was 
 the main drive behind the wide adoption of the BSD Socket interface. 
-A new common communication interface should aspire to find the right balance 
+A communication interface should aspire to find the right balance 
 between richness of semantics and ease of use.
 
 \subsection{Performance}
-Performance is major drive for innovation in networking, as much in HPC as 
-in Cloud Computing. All modern network technologies leverage common techniques 
+Performance is major drive for innovation in networking, from HPC to 
+Cloud Computing. All modern network technologies leverage common techniques 
 developed in the last two decades: OS-bypass, zero-copy, one-sided and asynchronous operations.
 
 \emph{OS-bypass} allows direct interaction between the application and 
 a virtualized instance of the network hardware, without involving the 
 operating system. 
-This technique is essential for low latency, as it removes the need for 
+This technique is essential for low latency as it removes the need for 
 interrupts in the critical path. Furthermore, a process or a thread blocking 
 in the kernel is often scheduled on a different core when awakened. Avoiding the 
 operating system can greatly improves NUMA locality. 
-To support OS-bypass, the network adapter must be able to demultiplex incoming 
+To support OS-bypass the network adapter must be able to demultiplex incoming 
 packets into corresponding queues in each application. Most of this 
 functionality is commonly used in Ethernet adapters that support Receive Side 
 Scaling (RSS).
@@ -109,65 +109,65 @@ with receive matching instead or remote addressing, as it is the case with MX
 and Portals.
 
 \emph{Asynchronous operations} are used to decouple the initiation of a 
-communication from its completion. They allow the cost of communication to be 
-overlapped with computation. Interestingly, enough computation could completely 
-overlap all communications, possibly making network bandwidth irrelevant. 
-More practically, asynchronous operations allow to initiate concurrent 
-data movements without blocking the application thread.
+communication from its progress and subsequent completion. This allows communication to be 
+overlapped with computation. 
+More practically, asynchronous operations enable initiation of concurrent 
+data movements without blocking the application context.
 
-To deliver the best performance, a new communication interface should present
+To deliver the best performance, a communication interface should present
 semantics that can efficiently leverage all these techniques as provided by 
 modern high-speed networks.
 
 \subsection{Scalability}
-Projections for exascale systems in HPC include hundreds of thousands of nodes 
+Projections for leadership scale systems in HPC include hundreds of thousands of nodes 
 and millions of cores\cite{dongarra:exascale-talk-2010}. In the commercial 
 space, Cloud Computing data centers are fast approaching these levels. 
 In this context, scalability is an important requirement. The time and space 
 overhead of a scalable communication interface should not grow linearly with 
 the number of communicating partners. BSD Sockets are inefficient in both 
 dimensions, as buffers and file handles are allocated for each new socket. 
-Through adaptive socket buffers and use of epoll(), Sockets implementations 
+Through adaptive socket buffering and use of epoll(), Sockets implementations 
 have so far managed to reasonably handle large number of connections. 
 MPI is inherently more scalable and it has successfully been deployed on large 
 HPC machines. However, it is not clear if MPI in its present form can 
 efficiently scale to millions of cores. 
-Scalability of the Verbs interface was originally quite poor due to it's Queue 
+Scalability of the Verbs interface was originally quite poor due to its Queue 
 Pair model. MPI implementations used various techniques such as connection on 
 demand\cite{Shipman_infinibandscalability} and dynamic buffer management 
-to work around the QPs memory footprint problem. Scalability later
-improved  with the addition of Shared Receive Queues 
+to work around the QPs memory footprint problem. Scalability was further
+improved with the addition of Shared Receive Queues 
 (SRQ)~\cite{shipman07:_inves_infin}, but distinct QPs are still  
 required on the send side~\cite{Shipman:2008:XIS:1431669.1431683}. To
-address the Cloud Computing and Exascale requirements, a new
+address the Cloud Computing and leadership class HPC requirements, a
 communication interface should aim for constant buffer and polling
 overhead, independently of the number of nodes in the fabric. 
 
 \subsection{Robustness}
-Hardware and software failures occur everywhere, all the time, especially on 
-large systems. Ignoring them is unacceptable. Unfortunately, this is exactly 
-how most MPI implementations handle such errors. There have been several 
-efforts aimed at designing fault-tolerant MPI libraries and add fault recovery 
-to the MPI specification, without success so far. The loose semantic about 
+Hardware and software failures occur frequently, often proportional with the size of the system. 
+As system sizes continue to increase, ignoring such failures will no longer be an option. 
+Most MPI implementations currently abort on failures that an application might otherwise tolerate. 
+To address this, there have been several efforts aimed at designing fault-tolerant MPI libraries and adding fault recovery 
+to the MPI specification. Thus far these efforts have had limited success. The loose semantic about 
 status completions was actually a benefit in making MPI a simpler interface, 
 developers would send messages and trust MPI to always deliver them. 
 Unfortunately, real-world applications eventually had to implement 
-checkpoint/restart functionality to work around this problem and it is the 
-only practical solution available today on large HPC systems. 
+checkpoint/restart functionality to tolerate system faults and it is the 
+only practical solution available today on large HPC systems today. 
 Both Sockets and Verbs fare better than MPI on this issue. They use connections 
-to represent the state of communication channels. Connections are essential 
-for robustness, they contain faults and allow for their recovery by resetting 
+to represent the state of communication channels without reliance on a single consistent 
+distributed process space ({\sf MPI\_COMM\_WORLD}). Connections provide a simplified 
+model for robustness; they contain faults and allow for their recovery by resetting 
 the state of the affected communication channels. 
 Unfortunately, both Sockets and Verbs associate buffers to a connection, which 
-negatively affects scalability. A new communication interface should provide 
+negatively affects scalability. A robust and scalable communication interface should provide 
 connection-oriented semantics without per-connection resources. 
 
 Communication reliability is often seen as a way to improve overall robustness. 
 For some applications such as Media Content Delivery (IPTV), Financial Trading 
 (HFT) or system-health monitoring, the provided reliability may be incompatible 
 with their timing requirements. 
-Furthermore, most scalable multicast implementations are unreliable. For these 
+Furthermore, the most scalable multicast implementations are unreliable. For these 
 reasons, a large share of applications use unreliable connections. 
-A new communication interface should provide different levels of connection 
+A communication interface should provide different levels of connection 
 reliability, as well as support for multicast. 
 
