@@ -94,7 +94,7 @@ in the MPI-3 standardization process are aimed at addressing these
 issues. 
 
 
-\subsection{Vendor APIs} There are numerous vendor- and
+\subsection{Specialized APIs} There are numerous vendor- and
 organization-specific APIs available today including OpenFabrics
 Verbs, Cray/Sandia's Portals~\cite{portals}, Qlogic's
 PSM, Myricom's MX, LBL's GASNet~\cite{gasnet}, 
@@ -116,7 +116,7 @@ posted before sending. Also, all data movement operations require registering th
 in advance. Verbs use the concept of Queue Pair (QP) represent a logical connection between 
 two processes.
 
-The Portals API provides one-sided semantics (i.e.  Put/Get) but uses match tags to steer
+The Portals API provides one-sided semantics (i.e.\ Put/Get) but uses match tags to steer
 messages to the correct buffers. The API is connection-less and leaves it up to the NAL to
 maintain any necessary connection state internally. Portals is mostly used on the large
 Cray systems such as ORNL's Jaguar~\cite{jaguar_cug_2010} and LANL's Cielo.  The
@@ -124,15 +124,15 @@ Lustre distributed file system NAL, LNET, was originally based on Portals~\cite{
 
 Both designed for efficiently implementing MPI, Myricom's MyrinetExpress (MX) and 
 Qlogic's PathScale Messages (PSM) have many similarities. Both provide a two-sided matching 
-interface which uses buffering for smaller messages and zero-copy for larger messages.  
-Both are connection-less in that the target does not have to accept.  Both provide reliable,
-in-order matching, but out-of-order completion.
+interface which use buffering for smaller messages and zero-copy for larger messages.  
+Both are connection-less in that the target does not have to accept.  Both provide reliable
+in-order matching with out-of-order completion.
 
 LAPI~\cite{lapi_a_1998} and DCMF~\cite{Kumar:2008:DCM:1375527.1375544}
-are both proprietary software stack developed by IBM, using as target
-the RS-series and lately the BlueGene P/Q IBM machines. While some support
-from the scientific community outside IBM existed, it failed to
-broaden and remains limited. DCMF do support an
+are both proprietary software stack developed by IBM, using as targets
+the RS-series and the BlueGene P/Q machines. While some support
+from the scientific community outside IBM exists, it has failed to
+broaden and remains limited. DCMF supports an
 interface for one-sided and two-sided message semantic, with
 contiguous or discontiguous memory layout, providing transparent support 
 for link aggregation. The DCMF communication layer supports 
@@ -141,8 +141,8 @@ multiple programming paradigms such as Aggregate Remote Memory Copy Interface
 a collective API, allowing processes to execute asynchronous collective
 communications in an optimized way.
 
-Among all of these interfaces, OFA's Verbs has the broadest adoption in HPC, 
+Among all of these interfaces, the OpenFabrics Verbs API has the broadest adoption in HPC, 
 representing 43\% of the machines in the Top 500~\cite{top500}. Despite 
-a limited success in the enterprise world, Verbs aspire to widen its audience 
+a limited success in the enterprise world, Verbs aspires to widen its audience 
 beyond HPC, especially over Ethernet through RoCEE~\cite{RoCEE}. As such, we 
-will refer to Verbs alongside Sockets and MPI in the rest of the document.
+will refer to Verbs alongside Sockets and MPI in the rest of this paper.
