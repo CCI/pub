@@ -51,8 +51,8 @@ relaxing order at the communication interface level is believed to be
 essential to enable effective technological solutions.
 
 Connections are established through a client-server process similar to 
-BSD Sockets or RDMA-CM\cite{rdma-cm}. However, applications such as 
-Apache\cite{apache} commonly use a 2-step mechanism where clients 
+BSD Sockets or RDMA-CM. However, applications such as 
+Apache commonly use a 2-step mechanism where clients 
 initially connect to a broker thread, which passes the requests to a 
 different thread for processing. This allows the application to 
 transparently handle requests with multiple processing threads.

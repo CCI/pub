@@ -46,7 +46,7 @@ one-sided operations. For point-to-point communication, MPI provides a variety o
 including blocking and non-blocking, synchronous and asynchronous, as well as \emph{ready}
 mode (only send if a matching receive has been posted).
 
-Multiple implementations exist~\cite{ompi_04_pvmmpi_overview, Gropp:1996:HPI, Liu:2003:RDMA, intel-mpi, platform-mpi}
+Multiple implementations exist~\cite{ompi_04_pvmmpi_overview, Gropp:1996:HPI, Liu:2003:RDMA}
 which support multiple operating systems and/or interconnects.  Rather than connections,
 the API uses the notion of communication groups (i.e.  communicators) which include all
 processes ({\sf MPI\_COMM\_WORLD}) and may be split to include subsets of processes. MPI does
@@ -96,10 +96,10 @@ issues.
 
 \subsection{Vendor APIs} There are numerous vendor- and
 organization-specific APIs available today including OpenFabrics
-Verbs\cite{ofa-verbs}, Cray/Sandia's Portals\cite{portals}, Qlogic's
-PSM\cite{psm}, Myricom's MX\cite{mx}, LBL's GASNet\cite{gasnet}, 
-DAPL~\cite{dapl}, IBM's LAPI\cite{lapi_a_1998}, IBM's 
-DCMF\cite{Kumar:2008:DCM:1375527.1375544} and so on. 
+Verbs, Cray/Sandia's Portals~\cite{portals}, Qlogic's
+PSM, Myricom's MX, LBL's GASNet~\cite{gasnet}, 
+DAPL~\cite{dapl}, IBM's LAPI~\cite{lapi_a_1998}, IBM's 
+DCMF~\cite{Kumar:2008:DCM:1375527.1375544} and so on. 
 Overall, they provide a lot of choice but none has appeared as 
 a widely used communication interface. Since most are targeted to 
 specific network technologies, the APIs tend to reflect the design 
@@ -119,7 +119,7 @@ two processes.
 The Portals API provides one-sided semantics (i.e.  Put/Get) but uses match tags to steer
 messages to the correct buffers. The API is connection-less and leaves it up to the NAL to
 maintain any necessary connection state internally. Portals is mostly used on the large
-Cray systems such as ORNL's Jaguar~\cite{jaguar_cug_2010} and LANL's Cielo~\cite{cielo}.  The
+Cray systems such as ORNL's Jaguar~\cite{jaguar_cug_2010} and LANL's Cielo.  The
 Lustre distributed file system NAL, LNET, was originally based on Portals~\cite{lnet}.
 
 Both designed for efficiently implementing MPI, Myricom's MyrinetExpress (MX) and 
