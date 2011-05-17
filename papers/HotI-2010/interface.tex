@@ -14,10 +14,10 @@ function to immediately return the next event for a particular endpoint.
 Optionally, this function can block if no events are available, allowing the 
 application thread to be scheduled out by the operating system. To facilitate 
 the integration of the blocking semantic with non-CCI operations, each endpoint 
-exposes an OS-specific handle such as file descriptor in Linux or an object in 
+exposes an OS-specific handle such as a file descriptor in Linux or an object in 
 Windows.
 
-The concept of endpoint is key to scalability. By multiplexing incoming 
+The concept of the endpoint is key to scalability. By multiplexing incoming 
 messages into a shared receive queue and similarly buffering outgoing 
 messages in a shared send queue, the overall memory footprint is independent 
 of the number of peers communicating with the endpoint. On the time dimension, 
@@ -42,10 +42,10 @@ As previously stated, unreliable connections are useful for some applications.
 Order however is an unusual characteristic, as most network technologies such 
 as Ethernet and InfiniBand assume order on the wire. 
 Nevertheless, there are several situations when unordered semantics are 
-desirable. For example, using multiple network links to increase bandwidth, 
-technique also known as \emph{channel bonding}, naturally does not provide 
-global packet ordering. Similarly, switch contention avoidance techniques, 
-such as adaptive routing, do break order when different routes are selected 
+desirable. For example, using multiple network links to aggregate bandwidth, 
+a technique also known as \emph{channel bonding}, inhibits global packet ordering. 
+Similarly, switch contention avoidance techniques, 
+such as adaptive routing,  break order when different routes are selected 
 between two endpoints. Switch contention is a major scalability concern, 
 relaxing order at the communication interface level is believed to be 
 essential to enable effective technological solutions.
@@ -54,21 +54,21 @@ Connections are established through a client-server process similar to
 BSD Sockets or RDMA-CM\cite{rdma-cm}. However, applications such as 
 Apache\cite{apache} commonly use a 2-step mechanism where clients 
 initially connect to a broker thread, which passes the requests to a 
-different thread for processing. This allow the application to 
+different thread for processing. This allows the application to 
 transparently handle requests with multiple processing threads.
 CCI goes a step further and provides a connection manager framework to 
 the application. Clients initiate a connection by specifying a server 
-Uniform Resource Identifier, a string that contains information used 
+Uniform Resource Identifier (URI), a string that contains information used 
 by the connection manager to identify the requested service. In the context of 
 HPC, it could be a batch queue system job identifier and a rank. For web 
 services, the URI could be a standard URL. The flexibility of the URI allows 
 for extensibility of naming and support of additional functionality, such as 
-system-wide load-balancing, fail-over, etc.
+system-wide load-balancing and fail-over.
 
-On the server side, the application binds to a service and receive 
+On the server side, the application binds to a service and receives 
 connection requests independently of any endpoint. The incoming connection 
-request carry a payload that can be used for identification or authentication. 
-Upon accepting the request, an endpoint is selected to completed the 
+request carries a payload that can be used for identification or authentication. 
+Upon accepting the request, an endpoint is selected to complete the 
 connection. This indirection allows the application to choose a local endpoint 
 at the last step of the connection process, effectively managing multiple 
 endpoints on multi-core systems.
@@ -76,62 +76,60 @@ endpoints on multi-core systems.
 \subsection{Active Messages}
 Buffering is the most efficient way to provide asynchronous semantics, which 
 is essential for scalability. BSD Sockets exclusively relies on buffering on both 
-send and receive sides; a Sockets sends return as soon as the data has been 
-written to the socket send buffer. Similarly, incoming payload is first 
-written to the socket receive buffer and then retrieved by the application.
+send and receive sides; a send returns as soon as the data has been 
+written to the send buffer. Similarly, an incoming payload is first 
+written to the receive buffer and then retrieved by the application.
 
-The Verbs interface provides asynchronous semantics through its send/recv 
+The Verbs interface provides asynchronous semantics through its send/receive
 operations. However, it delegates the buffer allocation to the application. 
-Receive buffers have to be posted on a Queue Pair prior to messages arrival 
+Receive buffers have to be posted on a QP prior to messages arrival 
 and they are matched in order, so they all have to be large enough for the 
-biggest possible messages when using a Shared Receive Queue (SRQ). 
-This put a practical limit to the maximum size of messages exchanged with 
+biggest possible message when using a Shared Receive Queue (SRQ). 
+This puts a practical limit on the maximum size of messages exchanged with 
 this mechanism.
 
-MPI offers explicitly buffered send but it is rarely used. Instead, the 
-standard send may or may not buffer the message, it returns when 
-the application buffer can be reused. In most implementation, it 
+MPI offers explicitly a buffered send but it is rarely used. Instead, the 
+standard send may or may not buffer the message; it returns when 
+the application buffer can be reused. In most implementations, it 
 depends on the message size as explained in Section~\ref{sec:mpi}. 
-Small messages are expected, and sometimes assumed, to be buffered. Larger 
+Small messages are expected and sometimes assumed to be buffered. Larger 
 messages block the send as long as the message is not delivered to the receive 
-side. Unfortunately, this assumed threshold is not defined by the MPI 
-specification, it often results in unsafe code that can deadlock, breaking 
+side. This assumed threshold is not defined by the MPI 
+specification and may result in unsafe code that can deadlock thereby breaking 
 portability. 
-The matching interface in MPI is very powerful but very complex. Support 
+The matching interface in MPI is powerful yet complex. Support 
 for wild cards require a single, coherent matching stack which cannot be 
 offloaded to effectively handle intra-node messages. In addition, matching 
-interfaces are stateful, which is greatly complicates fault recovery.
+interfaces are stateful,  greatly complicating fault recovery.
 
-CCI uses a variations of Active Messages~\cite{voneicken-isca92} (AM) 
+CCI uses a variation of Active Messages~\cite{voneicken-isca92} (AM) 
 to address these issues. 
 Most of AM's complexity, shared by GasNet\cite{gasnet}, is related 
 to the use of asynchronous handlers. CCI uses events instead to greatly 
-simplify the API. As the original AM implementation, buffers are managed 
-internally from a constant pool, on both send and receive sides. 
-On the receive side, the application is given access to a CCI buffer through 
+simplify the API. Similar to the original AM implementation, buffers are managed 
+internally from a constant pool on both send and receive sides. 
+On the receive side the application is given access to a CCI buffer through 
 a receive event. It may process the data in place or copy it out. When the 
-application returns the receive event to the CCI library, the corresponding 
+application returns the receive event to the CCI library the corresponding 
 receive buffer is recycled. Receive events can be returned out of order, so 
 the application can keep some receive buffers for some time if necessary. 
 On the send side, messages are immediately buffered.
 
 As with Verbs, the receive buffers have to be large enough for the largest 
 message. As the buffer management is removed from the application, CCI 
-explicitly defines a Maximum Message Size (MMS), specified by the underlying  
+explicitly defines a Maximum Send Size (MSS), specified by the underlying  
 device. This well-defined limit avoids the portability and unsafe assumption 
-of the MPI model. However, this maximum message size may be different for 
-different devices, therefore for different endpoints. When two endpoints 
-connect, the smallest MSS is used for that particular connection.
+of the MPI model. The MSS may be different for 
+different devices and therefore different endpoints. When two endpoints 
+connect the smallest MSS is used for that particular connection.
 
-This model is particularly efficient when the MMS aligns with the Maximum 
+This model is particularly efficient when the MSS aligns with the Maximum 
 Transfer Unit (MTU) of the underlying device, typically 2K to 8K. 
-In this case, no inter-packet state is needed, which greatly simplify 
-networking hardware requirements and allow CCI to leverage less 
+In this case, no inter-packet state is needed, greatly simplifying
+networking hardware requirements and allowing CCI to leverage less 
 sophisticated devices such as commodity Ethernet adapters. 
-Some HPC networks use a very small MTU, such as 256 Bytes for 
-IBM's BlueGene\note{need ref}. Such networks most likely 
-provide in-order hardware-based segmentation and reassembly, so they 
-can use a larger maximum message size without performance penalty.
+Some networks use a small MTU but 
+provide in-order hardware-based segmentation and reassembly. This allows a larger maximum message size with minimal overhead.
 
 If the application desires to send a message larger than the limit, it has 
 to perform segmentation and reassembly itself. With a typical MSS in the order 
@@ -157,28 +155,25 @@ remote memory protection than the Protection Domains of the Verbs API. A
 memory area can be registered on multiple CCI connections if needed.
 
 By requiring explicit memory registration, CCI avoids the mistake of MPI 
-where registration is not part of the API. It is performed in the critical 
-path, which lead to various unsafe caching mechanisms~\cite{regcache} 
+where registration is not part of the API. Implicit memory registration is performed in the critical 
+path, leading to various unsafe caching mechanisms~\cite{regcache} 
 (hijacking malloc and other system calls). 
-The virtualization needs are driving new and improved IOMMU functionality 
+Virtualization is driving new and improved IOMMU functionality 
 that would make memory registration obsolete on compliant hardware. 
 Unfortunately, it is not widely available at this time.
 
 With portability as an important design goal, the CCI RMA semantic is 
-designed to be efficiently implemented on top of the Active Messages 
+designed to be efficiently implemented on top of the CCI messaging model 
 for devices that do not provide zero-copy support in hardware. 
-Open-MX\cite{Gog11ParCo} has demonstrated high bandwidth and low CPU 
+Furthermore, Open-MX\cite{Gog11ParCo} has demonstrated high bandwidth and low CPU 
 overhead when using the Intel IOA/T copy engine to move data between receive 
-buffers of an Ethernet driver in the kernel and an RMA target are in user 
+buffers of an Ethernet driver in the kernel and an RMA target in user 
 space.
 
-Memory registration produces an handle which has to be communicated to the 
-remote side using Active Messages. RMA operations can optionally include a 
-small Active Messages, similar to Verbs' Immediate Data. Contrary to Verbs 
-and for performance and portability reasons, CCI does not guarantee delivery 
+Contrary to Verbs  and for performance and portability reasons, CCI does not guarantee delivery 
 order between RMA transfers, or even for data of a single RMA operation. 
-Actually, the InfiniBand Verbs does not guarantee Last-Byte-Written-Last 
-semantic as well, but early hardware did and users now assume it. It is 
+Actually, OFA Verbs does not guarantee Last-Byte-Written-Last 
+semantic as well, but early hardware did and some users now assume it. It is 
 very common for Verbs applications to poll on the last byte of a RDMA write 
 on the target side to determine when the RDMA has completed. This behavior is 
 unsafe if the DMA operations are not guaranteed to be delivered in order as 
@@ -190,5 +185,5 @@ on the connection. This semantic allows for optimizations where RMA packets
 can use multiple links or take different routes in the fabric and the ordering 
 cost is borne only when needed. This maps well to the Fence semantic of the 
 SHMEM~\cite{openshmem} API. With strong order between RDMA operations on a 
-given QP, Verbs cannot easily leverage these bonding and adaptive routing to 
+given QP, Verbs cannot easily leverage  bonding and adaptive routing to 
 increase effective bandwidth.
