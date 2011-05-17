@@ -5,17 +5,18 @@
 % JMS s/socket/Sockets/g (and sprinkle in ``BSD'')
 
 With the advent of ubiquitous networking and the Internet
-Protocol~\cite{RFC791} 
+Protocol~\cite{RFC791}
 % IP is the important part here -- not TCP / UDP.  Not advent or modern.
 Transmission Control Protocol (TCP) / Unreliable Datagram Protocol
 (UDP) providing connectivity across a diversity of hardware
 architectures and system software stacks, the need for a ubiquitous
-communication API providing application portability has been
-acute. The widely used BSD Sockets API has largely fulfilled this
+communication API providing application portability has been acute.
+
+The widely used BSD Sockets API has largely fulfilled this
 role, supporting a variety of underlying networking technologies
 through the TCP/UDP abstraction of the lower level interface. Since
 the standardization of TCP~\cite{tcp-rfc-675} in 1974 and
-UDP~\cite{udp-rfc-768} in 1980 and the socket API that supported these
+UDP~\cite{udp-rfc-768} in 1980 and the Sockets API that supported these
 protocols, networking technologies have made substantial
 strides. Early networking technologies supported by TCP/UDP such as
 10BASE5 Ethernet, Token Ring, and Token Bus technologies with

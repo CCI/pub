@@ -51,7 +51,7 @@ relaxing order at the communication interface level is believed to be
 essential to enable effective technological solutions.
 
 Connections are established through a client-server process similar to 
-Sockets or RDMA-CM\cite{rdma-cm}. However, applications such as 
+BSD Sockets or RDMA-CM\cite{rdma-cm}. However, applications such as 
 Apache\cite{apache} commonly use a 2-step mechanism where clients 
 initially connect to a broker thread, which passes the requests to a 
 different thread for processing. This allow the application to 
@@ -75,8 +75,8 @@ endpoints on multi-core systems.
 
 \subsection{Active Messages}
 Buffering is the most efficient way to provide asynchronous semantics, which 
-is essential for scalability. Sockets exclusively relies on buffering on both 
-send and receive sides, a Sockets sends return as soon as the data has been 
+is essential for scalability. BSD Sockets exclusively relies on buffering on both 
+send and receive sides; a Sockets sends return as soon as the data has been 
 written to the socket send buffer. Similarly, incoming payload is first 
 written to the socket receive buffer and then retrieved by the application.
 
