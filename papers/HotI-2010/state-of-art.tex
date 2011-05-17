@@ -58,7 +58,7 @@ implementation has written its own network abstraction layer (NAL). These NALs t
 support BSD Sockets as well as one or more vendor specific APIs.
 
 MPI is a less mature technology -- compared to Sockets -- likely due to its
-relative complexity (over 100 functions), niche market penetration
+relative complexity (over 300 functions), niche market penetration
 (HPC), and relative youth. While MPI semantics are fairly well defined
 by the MPI standard, implementations vary in their compliance to the
 MPI specification and may exhibit differing behavior when the standard is
@@ -95,58 +95,54 @@ issues.
 
 
 \subsection{Vendor APIs} There are numerous vendor- and
-organization-specific APIs including OpenFabrics
-Verbs~\cite{ofa-verbs}, Cray/Sandia's Portals~\cite{portals}, Qlogic's
-PSM~\cite{psm}, Myricom's MX~\cite{mx}, LBL's GASNet~\cite{gasnet},
-LAPI~\cite{lapi_a_1998}, DCMF~\cite{Kumar:2008:DCM:1375527.1375544} and
-so on.  Overall, they provide a lot of choice, but none is perfect
-(i.e. none have convinced they others to adopt their API).  Since most
-are targeted to specific hardware, the APIs tend to be more
-complicated.
+organization-specific APIs available today including OpenFabrics
+Verbs\cite{ofa-verbs}, Cray/Sandia's Portals\cite{portals}, Qlogic's
+PSM\cite{psm}, Myricom's MX\cite{mx}, LBL's GASNet\cite{gasnet}, 
+DAPL~\cite{dapl}, IBM's LAPI\cite{lapi_a_1998}, IBM's 
+DCMF\cite{Kumar:2008:DCM:1375527.1375544} and so on. 
+Overall, they provide a lot of choice but none has appeared as 
+a widely used communication interface. Since most are targeted to 
+specific network technologies, the APIs tend to reflect the design 
+of the underlying hardware. In the rest of this section, we will 
+present each of these interfaces.
 
-\note{Mention DAPL}.
-\note{reference last year's RoCee paper}
-Here is the cite for the RoCEE paper~\cite{RoCEE}.
-
-Based on the earlier VIA specification~\cite{via}, the InfiniBand standard does not specify
-an API; it only specifies which \emph{verbs} must be supported. After many vendors created
+Based on the earlier VIA specification~\cite{via}, the InfiniBand~\cite{ibta} standard does not specify
+an API; it only specifies which \emph{Verbs} must be supported. After many vendors created
 separate Verbs APIs, they eventually coalesced into the OpenFabrics Association's (OFA)
-Verbs. OFA's Verbs has had the broadest adoption, yet it still represents less than 43\%
-of the machines on the Top 500~\cite{top500} with some, but much less, adoption outside of
-HPC.
+Verbs. Verbs has support for two-sided and one-sided operations, always asynchronous. 
+In addition, Verbs has support for reliable and unreliable modes, connection-oriented
+and connection-less. Buffer management is left to the application, all receives must be 
+posted before sending. Also, all data movement operations require registering the memory 
+in advance. Verbs use the concept of Queue Pair (QP) represent a logical connection between 
+two processes.
 
-Verbs has support for (small) two-sided and one-sided operations. All operations are
-asynchronous. Verbs has support for reliable and unreliable modes, connection-oriented
-and connection-less. Verbs does not support buffering; all receives must be posted before
-sending. Also, all data movement operations require pinning the memory in advance. For the
-most common reliable, connection-oriented communication, Verbs requires that the two
-processes establish a queue-pair (QP), which is much more cumbersome than Socket's
-\f{connect} and \f{accept}. Lastly, requiring QPs between all processes has memory scaling
-issues. Work has been done with shared receive queues (SRQ) in MPI~\cite{srq} to help
-increase the scalability of Verb's based systems.\note{can someone review all of this?}
-
-The Portals API provides one-sided semantics (i.e.  Put/Get), uses match tags to steer
+The Portals API provides one-sided semantics (i.e.  Put/Get) but uses match tags to steer
 messages to the correct buffers. The API is connection-less and leaves it up to the NAL to
 maintain any necessary connection state internally. Portals is mostly used on the large
 Cray systems such as ORNL's Jaguar~\cite{jaguar_cug_2010} and LANL's Cielo~\cite{cielo}.  The
 Lustre distributed file system NAL, LNET, was originally based on Portals~\cite{lnet}.
 
-Both designed for implementing MPI, Myricom's MyrinetExpress (MX) and Qlogic's PathScale
-Messages (PSM) have many similarities. Both provide a two-sided interface which uses
-buffering for smaller messages and remote direct memory access for larger messages.  Both
-are connection-less in that the target does not have to accept.  Both provide reliable,
+Both designed for efficiently implementing MPI, Myricom's MyrinetExpress (MX) and 
+Qlogic's PathScale Messages (PSM) have many similarities. Both provide a two-sided matching 
+interface which uses buffering for smaller messages and zero-copy for larger messages.  
+Both are connection-less in that the target does not have to accept.  Both provide reliable,
 in-order matching, but out-of-order completion.
 
 LAPI~\cite{lapi_a_1998} and DCMF~\cite{Kumar:2008:DCM:1375527.1375544}
 are both proprietary software stack developed by IBM, using as target
-the RS-series and lately the BG P/Q IBM machines. While some support
+the RS-series and lately the BlueGene P/Q IBM machines. While some support
 from the scientific community outside IBM existed, it failed to
-broaden and remains limited to few places. DCMF do support an
+broaden and remains limited. DCMF do support an
 interface for one-sided and two-sided message semantic, with
-contiguous or not memory layout, dealing with multiple [identical]
-interconnects seamlessly. The DCMF communication layer supports in
-addition to MPI, multiple programming paradigms such as Aggregate
-Remote Memory Copy Interface (ARMCI) and Global Arrays (GA). It
-provides in addition to the point-to-point interface, a collective
-API, allowing processes to execute asynchronous collective
+contiguous or discontiguous memory layout, providing transparent support 
+for link aggregation. The DCMF communication layer supports 
+multiple programming paradigms such as Aggregate Remote Memory Copy Interface 
+(ARMCI) and Global Arrays (GA), in addition to MPI. It also provides 
+a collective API, allowing processes to execute asynchronous collective
 communications in an optimized way.
+
+Among all of these interfaces, OFA's Verbs has the broadest adoption in HPC, 
+representing 43\% of the machines in the Top 500~\cite{top500}. Despite 
+a limited success in the enterprise world, Verbs aspire to widen its audience 
+beyond HPC, especially over Ethernet through RoCEE~\cite{RoCEE}. As such, we 
+will refer to Verbs alongside Sockets and MPI in the rest of the document.
