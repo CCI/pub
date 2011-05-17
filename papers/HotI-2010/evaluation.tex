@@ -2,17 +2,18 @@
 \label{sec:evaluation}
 
 \subsection{Portability}
-We have two partial, proof-of-concept implementations, one over UDP Sockets and
+We have two proof-of-concept implementations, one over UDP Sockets and
 one over Portals 3.3.
 
-The Sockets prototype driver opens one SOCK\_DGRAM (UDP) socket per CCI endpoint
-and has to provide reliability (acknowledgement and retransmission on loss).
-The Sockets driver also has to multiplex connections over the single socket.
+The Sockets prototype driver opens one SOCK\_DGRAM (UDP) socket per
+CCI endpoint, with CCI  providing optional reliability and optional
+ordering (UU, RO, RU). 
+The Sockets driver multiplexes connections over a single socket.
 Enough functions are complete including RMA write to allow simple pingpong
 tests to exercise the CCI API.
 
-The Portals implementation also implements enough functions to run a pingpong
-test with active messages. Since Portals assumes a reliable interconnect, the
+The Portals implementation provides UU, RO, and RU over the portals
+interface. Since Portals assumes a reliable interconnect, the
 only difference between a CCI UU connection and a RO/RU connection is that we
 complete a UU send when we receive the Portals' SEND\_END event which indicates
 that the sender's buffer is no longer needed (i.e. the data is on the wire).
@@ -56,21 +57,21 @@ For the Portals driver, each connection requires 104 bytes on 64-bit machines
 struct, and 64 bytes for the Portals driver connection struct).  The sock driver
 needs 140 bytes for each connection.
 
-Figure \ref{fig:memory} shows the connection state (not including buffers) for
-Verbs, BSD Sockets, and CCI. The memory usage for Verbs comes from
-\cite{Shipman:2008:XIS:1431669.1431683} for X-SRQ which uses a single shared
-receive QP for each node along with a send QP for each peer process. This is
-the best case scenario for Verbs. Originally, Verbs required
-\begin{math}O(N^2)\end{math} QPs. The Sockets usage is derived from a single 4
-KB page for send and receive buffers in addition to some minimal internal state.
+Figure \ref{fig:memory} illustrates the connection state for
+Verbs, BSD Sockets, and CCI. Verbs memory usage scales
+linearly~\cite{Shipman:2008:XIS:1431669.1431683} with the number of
+connected peers when Reliable Connected (RC) mode. This is
+the best case scenario for Verbs. The Sockets usage is derived from
+the minimum 4 KB page send and receive buffers and internal state tied
+to the connection. 
+
+%% In addition to minimal connection state, CCI, Verbs, and Sockets
+%% require additional memory for send/receive buffers. Both CCI and Verbs
+%% support a shared memory pool model for send/receive buffers. 
 
 The CCI usage conservatively assumes 256 bytes (assuming alingment padding,
 etc.) as used in the UDP driver. Obviously, if CCI is implemented over Verbs,
 for example, then this amount is on top of the underlying implementation. In
 order to provide support for Verbs hardware (Infiniband, iWarp, etc.), we intend
 to use Verb's Unreliable Datagram (UD) mode to avoid the QP memory usage by
-Verb's Reliable Connected (RC) mode.
-
-
-\subsection{Robustness}
-
+Verb's Reliable Connected (RC) or eXtended Reliable Connnected (XRC) modes.
