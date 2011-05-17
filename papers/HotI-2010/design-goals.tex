@@ -126,7 +126,7 @@ In this context, scalability is an important requirement. The time and space
 overhead of a scalable communication interface should not grow linearly with 
 the number of communicating partners. BSD Sockets are inefficient in both 
 dimensions, as buffers and file handles are allocated for each new socket. 
-Through adaptive socket buffering and use of epoll(), Sockets implementations 
+Through adaptive socket buffering and use of \f{epoll}, Sockets implementations 
 have so far managed to reasonably handle large number of connections. 
 MPI is inherently more scalable and it has successfully been deployed on large 
 HPC machines. However, it is not clear if MPI in its present form can 
@@ -171,3 +171,5 @@ reasons, a large share of applications use unreliable connections.
 A communication interface should provide different levels of connection 
 reliability, as well as support for multicast. 
 
+
+% LocalWords:  epoll QPs

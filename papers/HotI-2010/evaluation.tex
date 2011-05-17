@@ -23,10 +23,10 @@ of receipt at the peer.
 \subsection{Performance}
 We wrote a native Portals ping pong and compared it to the CCI ping pong
 performance. We ran tests on a Cray XT6 and locked the processes to the same
-cores for both tests. The CCI over Portals \begin{math}\frac{1}{2}\end{math}RTT
+cores for both tests. The CCI over Portals HRT ping pong
 was less than 200ns more than the native Portals' performance up to 256 bytes.
-For an eight byte message, for example, CCI's latency is 5.91 \us versus 5.74
-\us for native Portals. Figures \ref{fig:latency} and \ref{fig:bw} show latency
+For an eight byte message, for example, CCI's latency is 5.91\us versus 
+5.74\us for native Portals. Figures \ref{fig:latency} and \ref{fig:bw} show latency
 and bandwidth for active messages up to 8 KB on a Cray XT6.
 
 \begin{figure}[htbp]
