@@ -28,14 +28,14 @@ interfaces. The rationale is that larger codes are harder to debug and
 maintain. For example, an analysis of the Open MPI version 1.4.3 implementation shows substantial
 differences between the seven supported communication APIs (excluding self and 
 shared memory). The total lines of code of each Byte Transfer Layer (BTL) is 
-listed in Table \ref{tab:btl}. The Verbs BTL is the largest, triple the size 
-of the TCP sockets BTL, second largest, and 5 to 6 times larger than the BTLs of 
-vendor interfaces. 
+listed in Table \ref{tab:btl}. The Verbs BTL is the largest, five times the size 
+of the TCP sockets BTL, third largest, and 8 to 13 times larger than the BTLs of 
+the vendor interfaces. 
 
 \begin{table}[htbp] \centering
 \caption{Lines of Code per BTL}
 \label{tab:btl}
-\begin{IEEEeqnarraybox}[\IEEEeqnarraystrutmode\IEEEeqnarraystrutsizeadd{2pt}{1pt}]{v/s/v/s/v}
+\begin{IEEEeqnarraybox}[\IEEEeqnarraystrutmode\IEEEeqnarraystrutsizeadd{2pt}{1pt}]{v/s/v/u/v}
 \IEEEeqnarrayrulerow\\ &\mbox{BTL}&&Lines of code&\\
 \IEEEeqnarraydblrulerow\\
 \IEEEeqnarrayseprow[3pt]\\ &Elan&&1,656&\IEEEeqnarraystrutsize{0pt}{0pt}\\
@@ -56,7 +56,7 @@ vendor interfaces.
 \IEEEeqnarrayseprow[3pt]\\ &UDAPL&&6,208&\IEEEeqnarraystrutsize{0pt}{0pt}\\
 \IEEEeqnarrayseprow[3pt]\\
 \IEEEeqnarrayrulerow\\
-\IEEEeqnarrayseprow[3pt]\\ &OpenIB (Verbs)&&13,994&\IEEEeqnarraystrutsize{0pt}{0pt}\\
+\IEEEeqnarrayseprow[3pt]\\ &OpenIB (Verbs)&&21,574&\IEEEeqnarraystrutsize{0pt}{0pt}\\
 \IEEEeqnarrayseprow[3pt]\\
 \IEEEeqnarrayrulerow
 \end{IEEEeqnarraybox}
