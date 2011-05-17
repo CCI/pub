@@ -121,7 +121,7 @@ explicitly defines a Maximum Send Size (MSS), specified by the underlying
 device. This well-defined limit avoids the portability and unsafe assumption 
 of the MPI model. The MSS may be different for 
 different devices and therefore different endpoints. When two endpoints 
-connect the smallest MSS is used for that particular connection.
+connect the smallest MSS is used for that connection.
 
 This model is particularly efficient when the MSS aligns with the Maximum 
 Transfer Unit (MTU) of the underlying device, typically 2K to 8K. 
@@ -137,8 +137,8 @@ of a page size, the segmentation can effectively pipeline the copy into the
 send buffers with the packet injection itself. On the receive side, 
 reassembly will require an extra memory copy, unless the application can 
 manipulate the data in place over several non-contiguous receive buffers.
-However, the segmentation/reassembly effort is a clear incentive for the 
-application to restrict the Messages semantic in CCI to smaller traffic 
+However, the segmentation/reassembly effort is a clear incentive 
+to restrict the messages semantic in CCI to smaller traffic 
 such as synchronization messages.
 
 \subsection{Remote Memory Access}
