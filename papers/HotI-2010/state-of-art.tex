@@ -1,13 +1,13 @@
 \section{State of the Art}
 \label{sec:state}
 Over the years, many communication interfaces have come and gone. The few that have
-remained and seen wide-spread adoption are BSD sockets\cite{Sechrest:CSD-84-191}, the Message Passing
+remained and seen wide-spread adoption are BSD Sockets\cite{Sechrest:CSD-84-191}, the Message Passing
 Interface (MPI)\cite{mpi_forum93:_mpi}, and some vendor-specific application programming interfaces
 (API).
 
-\subsection{Sockets} The socket interface is the most widely used by far. All major
-operating systems provide support for sockets and the Internet and all the services it
-provides would not exist without it. The popularity of sockets can be attributed to:
+\subsection{Sockets} The Sockets interface is the most widely used by far. All major
+operating systems provide support for Sockets; the Internet and all the services it
+provides would not exist without it. The popularity of BSD Sockets can be attributed to:
 
 \begin{itemize}
 \item Simple API
@@ -52,9 +52,9 @@ MPI\_Comm\_connect, but this is less mature and much less used.
 
 The MPI standard does not define an underlying network protocol and each MPI
 implementation has written its own network abstraction layer (NAL). These NALs typically
-support sockets as well as one or more vendor specific APIs.
+support BSD Sockets as well as one or more vendor specific APIs.
 
-MPI is a less mature technology compared to sockets likely due to its
+MPI is a less mature technology -- compared to Sockets -- likely due to its
 relative complexity (over 100 functions), niche market penetration
 (HPC), and relative youth. While MPI semantics are fairly well defined
 by the MPI standard, implementations vary in their compliance to the
@@ -117,7 +117,7 @@ asynchronous. Verbs has support for reliable and unreliable modes, connection-or
 and connection-less. Verbs does not support buffering; all receives must be posted before
 sending. Also, all data movement operations require pinning the memory in advance. For the
 most common reliable, connection-oriented communication, Verbs requires that the two
-processes establish a queue-pair (QP), which is much more cumbersome than socket's
+processes establish a queue-pair (QP), which is much more cumbersome than Socket's
 \f{connect} and \f{accept}. Lastly, requiring QPs between all processes has memory scaling
 issues. Work has been done with shared receive queues (SRQ) in MPI\cite{srq} to help
 increase the scalability of Verb's based systems.\note{can someone review all of this?}
