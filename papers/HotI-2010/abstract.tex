@@ -1,29 +1,29 @@
 \begin{abstract}
-There are many user-level network APIs for connecting and exchanging
-data between peers.  Each API varies widely when evaluating them based
-on metrics including (but not limited to) performance, portability,
-and complexity.  Specifically, many APIs make design or implementation
-choices that end up emphasizing some of the more desirable metrics
-(e.g., performance) while sacrificing others (e.g., portability).  As
-a direct result, software developers striving to build large,
-network-based applications end up having to choose which network API
-to use based on a complex, multi-dimensional set of criteria -- but
-still inevitably end up with an API that fails to deliver features in
-at least some desirable metrics.
+  There are many user-level APIs for connecting and exchanging data
+  between network peers.  Each interface varies wildly when evaluating
+  them based on metrics including (but not limited to) performance,
+  portability, and complexity.  Specifically, many interfaces make
+  design or implementation choices that end up emphasizing some of the
+  more desirable metrics (e.g., performance) while sacrificing others
+  (e.g., portability).  As a direct result, software developers
+  building large, network-based applications end up having to choose
+  which network API to use based on a complex, multi-dimensional set
+  of criteria -- but still inevitably end up with an interface that
+  fails to deliver features in at least some desirable metrics.
 
-In this paper, we introduce a novel API that both supports many
-features that have become standard (or otherwise generally expected)
-in other communication APIs, and strives to export a small,
-simplistic, yet powerful, interface.  The interfaces in this new API
-draw upon years of diverse networking research spanning from theories
-of developer best practices to systems-level implementation
-algorithms.  The goal was to create a relatively simple, high-level
-communications API -- one that might even feel somewhat ``familiar''
-to developers because of its roots in many other, existing network
-APIs -- that still provides important features such as scalability,
-resiliency, and performance.  The result is the Common Communications
-Infrastructure (CCI) API: an API that is simple enough to implement in
-hardware, explicitly designed to incur minimal overhead from a host
-operating system, and performant enough to meet the needs of
-network-intensive applications.
+  In this paper, we introduce a novel interface that both supports
+  many features that have become standard (or otherwise generally
+  expected) in other communication interfaces, and strives to export a
+  small, yet powerful, interface.  This new interface draws upon years
+  of diverse networking research spanning from theories of application
+  software development to systems-level implementation algorithms.
+  The goal was to create a relatively simple, high-level
+  communications interface -- one that might even feel somewhat
+  ``familiar'' to developers because of its roots in many other,
+  existing network APIs -- that still provides important features such
+  as scalability, resiliency, and performance.  The result is the
+  Common Communications Interface (CCI): an API that is simple enough
+  to implement in hardware, explicitly designed to incur minimal
+  overhead from a host operating system, and performant enough to meet
+  the needs of network-intensive applications.
 \end{abstract}

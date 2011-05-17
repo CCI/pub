@@ -2,80 +2,104 @@
 \label{sec:introduction}
 
 % JMS s/API/interface/g
-% JMS s/socket/Sockets/g (and sprinkle in ``BSD'')
 
-With the advent of ubiquitous networking and the Internet
-Protocol~\cite{RFC791}
-% IP is the important part here -- not TCP / UDP.  Not advent or modern.
-Transmission Control Protocol (TCP) / Unreliable Datagram Protocol
-(UDP) providing connectivity across a diversity of hardware
-architectures and system software stacks, the need for a ubiquitous
-communication API providing application portability has been acute.
+In 1981, the Internet Protocol (IP)~\cite{RFC791} began the era of
+ubiquitous networking.  The Transmission Control Protocol
+(TCP)~\cite{RFC793} was layered on top of IP, freeing application
+developers from many network-specific issues such as reliable delivery
+and message ordering.  Even though TCP/IP was implemented in a wide
+variety of compute and networking hardware, developers still needed a
+common API to create portable software.
+%
+The BSD Sockets API filled that role, and became the {\em de facto}
+networking API for most platforms.  
 
-The widely used BSD Sockets API has largely fulfilled this
-role, supporting a variety of underlying networking technologies
-through the TCP/UDP abstraction of the lower level interface. Since
-the standardization of TCP~\cite{tcp-rfc-675} in 1974 and
-UDP~\cite{udp-rfc-768} in 1980 and the Sockets API that supported these
-protocols, networking technologies have made substantial
-strides. Early networking technologies supported by TCP/UDP such as
-10BASE5 Ethernet, Token Ring, and Token Bus technologies with
-multi-millisecond latencies, have been replaced by technologies such
-as 10GBase-SR and Quad Data Rate (QDR) InfiniBand (IB), Cray's Gemini,
-IBM's Torrent, and SGI's NumaLink with latencies as low as 1$\mu$s.
-% move token ring and friends to a parenthetical at the end -- the
-% main point is that it was developed in a slow network
+But even though both the BSD Socket wire protocol and API are still
+widely used today, the networking hardware that they are used on has
+changed radically.
+%
+For example, typical half round trip (HRT) TCP ping-pong latencies
+were measured in multiple milliseconds on early technologies such as
+10BASE5 Ethernet, Token Ring, and Token Bus.
+%
+Modern networking technologies such as 10GBase-SR, Quad Data Rate
+(QDR) InfiniBand (IB), Cray's Gemini network, IBM's Torrent network,
+and SGI's NumaLink network have HRT ping pong latencies as low as
+1$\mu$s.
 
-Current generation networking technologies provide advanced features
-such as supportf for remote direct memory access (RDMA) OS bypass,
-zero copy, one-sided operations, asynchornous operations,
-% JMS make better
-Sockets interface supports most of today's advanced networking
-technologies, 
-% JMS it's opposite day! ^^
-% sockets provides basic support and t obfuscates other underlying functionality
-the stream-based API of Sockets obfuscates and often
-negates the benefits of these features. In response, a number of
-next-generation network APIs have been proposed, such as the Virtual
-Interface Architecture (VIA), OpenFabrics Verbs, Myrinet eXpress (MX),
-and the Portals API. While adequately exposing the underlying network
-interface's capabilities, none of these network APIs has garnered the
-support from application developers that the Sockets interface
-has. Two key barriers exist to widespread adoption of many of these
-APIs, simplicity from an application developer perspective, and
-portability (including performance portability) across a variety of
-networking technologies.
+Current generation networking technologies also provide features such
+as remote direct memory access (RDMA), operating system (OS) bypass,
+``zero copy'' hardware support, one-sided operations, and asynchronous
+operations.
+%
+While some implementations of the BSD Sockets interface can utilize a
+subset of these features, its API does not directly expose any of them
+to applications.
+%
+As a direct result, several next-generation network APIs have evolved,
+such as the Virtual Interface Architecture (VIA), OpenFabrics Verbs,
+Myrinet eXpress (MX), and the Portals API -- just to name a few.
+%
+While these interface adequately expose the underlying network's
+capabilities, none of them have garnered the support from application
+developers that the Sockets interface has.
+%
+Two key barriers exist to widespread adoption: simplicity (from an
+application developer perspective) and portability across a variety of
+OS and networking technologies (including performance portability).
 
-Application developers are currently forced to make substantial
-tradeoffs in the selection of an underlying networking API for their
-distributed applications. The use of Sockets virtually guarantees
-portability across a wide range of operating environments but may
-substantially limit performance and scalability. The use of a custom
-networking API may satisfy performance and scalability requirements
-but exposes the application to limited portability and may implicitly
-remove flexibility in future infrastructure procurements. As a growing
-% JMS ``procurement'' is weird here -- vendor/technology lock-in.
-number of applications in the area of internet search technologies,
-cloud computing, financial trading and rich media require the
-scalability and performance once reserved for high-performance
-computing applications, the need for an API that addresses both
-portability and performance is acute.
+Application developers are therefore forced to make substantial
+tradeoffs in the selection of a user-level network interface for their
+network-based applications.
+%
+While the use of BSD Sockets guarantees portability across nearly
+every type of existing network, the emulation of the Sockets API over
+an underlying network-native software API can substantially limit both
+performance and scalability.
+%
+On the other hand, the use of a native networking API may satisfy
+performance and scalability requirements, but limit the application's
+portability to future platforms.
 
-In this paper we propose a new networking API known as the Common
-Communication Infrastructure (CCI) that balances the needs of
-portability and simplicity while preserving the performance
-capabilities of current and next-generation networking
-technologies. In developing CCI we have drawn upon our prior
-experience with a variety of low-level networking APIs as well as our
-experience in working directly with application developers in the use
-of these APIs. We strive, wherever possible, to adhere to our primary
-goal of simplicity in order to foster wide-spread adoption while
-maintaining performance and portability. The remainder of this paper
-is organized as follow.  Section~\ref{sec:state} depicts the
-state-of-the-art of the common messaging APIs, followed by a section
-describing our designs goals.  In Section~\ref{sec:interface}, we
-details the CCI entities, endpoints and connections, as well as the
-API. Finally, we present the current implementation performance over
-UDP and Portals low level interfaces, and then conclude the paper.
+Additionally, metrics that used to be the sole purview of High
+Performance Computing (HPC) -- such as ultra-low HRT latencies and
+maximized bandwidth at small message sizes -- are becoming important
+to other types of common applications, including: internet search
+technologies, cloud computing, financial trading, and rich media
+serving.
+%
+Indeed, as the raw bandwidth of network technologies continues to
+increase, compute servers need to be able to utilize the entire
+network capacity.
+%
+A portable network interface API is needed that removes the
+inefficiencies of TCP, provides convenient abstractions for
+applications, and enables portability across a wide variety of OS,
+compute server, and network platforms.
+
+In this paper, we propose a new networking interface: the Common
+Communication Infrastructure (CCI).  
+%
+CCI balances the needs of portability and simplicity while preserving
+the performance capabilities of advanced networking technologies. 
+%
+In designing CCI, we have drawn upon prior research with a variety of
+low-level networking interfaces as well as our experience in working
+directly with application developers in the use of these APIs.
+%
+Whenever possible, we adhered to our primary goal of simplicity in
+order to foster wide-spread adoption, yet preserving both performance
+and portability.
+
+The remainder of this paper is organized as follows:
+%
+Section~\ref{sec:state} depicts the state-of-the-art of the common
+messaging APIs, followed by a section describing our designs goals.
+%
+In Section~\ref{sec:interface}, we detail the CCI abstraction entities
+(e.g., {\em endpoints} and {\em connections}) as well as the API.
+%
+Finally, we present our current implementation performance over UDP
+and Portals low level interfaces, and then conclude the paper.
 
 
