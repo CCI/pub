@@ -104,7 +104,7 @@ interfaces are stateful,  greatly complicating fault recovery.
 
 CCI uses a variation of Active Messages~\cite{voneicken-isca92} (AM) 
 to address these issues. 
-Most of AM's complexity, shared by GasNet\cite{gasnet}, is related 
+Most of AM's complexity, shared by GasNet~\cite{gasnet}, is related 
 to the use of asynchronous handlers. CCI uses events instead to greatly 
 simplify the API. Similar to the original AM implementation, buffers are managed 
 internally from a constant pool on both send and receive sides. 
@@ -165,7 +165,7 @@ Unfortunately, it is not widely available at this time.
 With portability as an important design goal, the CCI RMA semantic is 
 designed to be efficiently implemented on top of the CCI messaging model 
 for devices that do not provide zero-copy support in hardware. 
-Furthermore, Open-MX\cite{Gog11ParCo} has demonstrated high bandwidth and low CPU 
+Furthermore, Open-MX~\cite{Gog11ParCo} has demonstrated high bandwidth and low CPU 
 overhead when using the Intel IOA/T copy engine to move data between receive 
 buffers of an Ethernet driver in the kernel and an RMA target in user 
 space.

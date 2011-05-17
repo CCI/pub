@@ -120,7 +120,7 @@ modern high-speed networks.
 
 \subsection{Scalability}
 Projections for leadership scale systems in HPC include hundreds of thousands of nodes 
-and millions of cores\cite{dongarra:exascale-talk-2010}. In the commercial 
+and millions of cores~\cite{dongarra:exascale-talk-2010}. In the commercial 
 space, Cloud Computing data centers are fast approaching these levels. 
 In this context, scalability is an important requirement. The time and space 
 overhead of a scalable communication interface should not grow linearly with 
@@ -133,7 +133,7 @@ HPC machines. However, it is not clear if MPI in its present form can
 efficiently scale to millions of cores. 
 Scalability of the Verbs interface was originally quite poor due to its Queue 
 Pair model. MPI implementations used various techniques such as connection on 
-demand\cite{Shipman_infinibandscalability} and dynamic buffer management 
+demand~\cite{Shipman_infinibandscalability} and dynamic buffer management 
 to work around the QPs memory footprint problem. Scalability was further
 improved with the addition of Shared Receive Queues 
 (SRQ)~\cite{shipman07:_inves_infin}, but distinct QPs are still  
