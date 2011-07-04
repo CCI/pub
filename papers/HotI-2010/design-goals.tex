@@ -100,7 +100,7 @@ the data has safely been delivered on the receive side (or at least put on
 the wire for unreliable connections).
 
 Zero-copy is often confused with \emph{one-sided operations}, which allow a 
-communication to completed without the involvement of the application thread 
+communication to complete without the involvement of the application thread 
 on the remote side. All of the required information, mainly the remote address 
 of the data to access, is provided on the origin side. One-sided operations 
 may or may not be associated with zero-copy, and may use the help of a 
@@ -152,7 +152,7 @@ status completions was actually a benefit in making MPI a simpler interface,
 developers would send messages and trust MPI to always deliver them. 
 Unfortunately, real-world applications eventually had to implement 
 checkpoint/restart functionality to tolerate system faults and it is the 
-only practical solution available today on large HPC systems today. 
+only practical solution available today on large HPC systems. 
 Both Sockets and Verbs fare better than MPI on this issue. They use connections 
 to represent the state of communication channels without reliance on a single consistent 
 distributed process space ({\sf MPI\_COMM\_WORLD}). Connections provide a simplified 

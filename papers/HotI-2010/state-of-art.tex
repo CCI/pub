@@ -32,7 +32,7 @@ throughput over the network.
 
 Sockets, when used with SOCK\_STREAM, inherits the well-known TCP
 performance constraints~\cite{Foong03tcpperformance} related to the
-scaling window and the bandwidth delay product. 
+scaling window and the bandwidth-delay product. 
 
 \subsection{MPI}
 \label{sec:mpi} 
@@ -47,7 +47,7 @@ including blocking and non-blocking, synchronous and asynchronous, as well as \e
 mode (only send if a matching receive has been posted).
 
 Multiple implementations exist~\cite{ompi_04_pvmmpi_overview, Gropp:1996:HPI, Liu:2003:RDMA}
-which support multiple operating systems and/or interconnects.  Rather than connections,
+which various multiple operating systems and/or interconnects.  Rather than connections,
 the API uses the notion of communication groups (i.e.  communicators) which include all
 processes ({\sf MPI\_COMM\_WORLD}) and may be split to include subsets of processes. MPI does
 provide a notion of dynamic process management which includes {\sf MPI\_COMM\_ACCEPT} and
@@ -113,7 +113,7 @@ Verbs. Verbs has support for two-sided and one-sided operations, always asynchro
 In addition, Verbs has support for reliable and unreliable modes, connection-oriented
 and connection-less. Buffer management is left to the application, all receives must be 
 posted before sending. Also, all data movement operations require registering the memory 
-in advance. Verbs use the concept of Queue Pair (QP) represent a logical connection between 
+in advance. Verbs use the concept of Queue Pair (QP) to represent a logical connection between 
 two processes.
 
 The Portals API provides one-sided semantics (i.e.\ Put/Get) but uses match tags to steer
@@ -125,7 +125,7 @@ Lustre distributed file system NAL, LNET, was originally based on Portals~\cite{
 Both designed for efficiently implementing MPI, Myricom's MyrinetExpress (MX) and 
 QLogic's PathScale Messages (PSM) have many similarities. Both provide a two-sided matching 
 interface which use buffering for smaller messages and zero-copy for larger messages.  
-Both are connection-less in that the target does not have to accept.  Both provide reliable
+Both are connection-less in that the target does not have to accept connection requests.  Both provide reliable
 in-order matching with out-of-order completion.
 
 LAPI~\cite{lapi_a_1998} and DCMF~\cite{Kumar:2008:DCM:1375527.1375544}
