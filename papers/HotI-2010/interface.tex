@@ -237,7 +237,7 @@ on the connection. This semantic allows for optimizations where RMA packets
 can use multiple links or take different routes in the fabric and the ordering 
 cost is borne only when needed. An implementation of the SHMEM~\cite{openshmem} API on top of CCI would use the Fence flag on the first RMA operation following a call to $shmem_fence()$. With strong order between RDMA operations on a given QP, OFA Verbs cannot easily leverage bonding and adaptive routing to increase effective bandwidth.
 
-The memory registration and RMA functions are presented below. Memory registration produces an memory handle than can be send to the target side of a subsequent RMA operation. The RMA call itself requires both a local and remote memory handles. In addition, it allows to optionally piggyback an header segment as an active message. This message is ordered relative to the delivery of the RMA data, the corresponding receive event can be used to notify completion of the RMA on the target. This mechanism is similar to the small \emph{immediate} data in Verbs. However, RMA header in CCI can be as large as the MSS of the specific connection.
+The memory registration and RMA functions are presented below. Memory registration produces an memory handle than can be send to the target side of a subsequent RMA operation. The RMA call itself requires both a local and remote memory handles. In addition, it allows to optionally piggyback an header segment as an active message. This message is ordered relative to the delivery of the RMA data, the corresponding receive event can be used to notify completion of the RMA on the target. This mechanism is similar to the small \emph{immediate} data in Verbs.
 
 \lstset{language=C, frame=single, basicstyle=\small}
 \begin{lstlisting}
