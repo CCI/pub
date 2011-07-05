@@ -2,12 +2,11 @@
 \label{sec:state}
 Over the years, many communication interfaces have come and gone. The few that have
 remained and seen wide-spread adoption are BSD Sockets~\cite{Sechrest:CSD-84-191}, the Message Passing
-Interface (MPI)~\cite{mpi_forum93:_mpi}, and some vendor-specific application programming interfaces
-(API).
+Interface (MPI)~\cite{mpi_forum93:_mpi}, and some vendor-specific APIs.
 
 \subsection{Sockets} The Sockets interface is the most widely used by far. All major
 operating systems provide support for Sockets; the Internet and all the services it
-provides would not exist without it. The popularity of BSD Sockets can be attributed to:
+provides relies upon it. The popularity of BSD Sockets can be attributed to:
 
 \begin{itemize}
 \item Simple API
@@ -47,7 +46,7 @@ including blocking and non-blocking, synchronous and asynchronous, as well as \e
 mode (only send if a matching receive has been posted).
 
 Multiple implementations exist~\cite{ompi_04_pvmmpi_overview, Gropp:1996:HPI, Liu:2003:RDMA}
-which various multiple operating systems and/or interconnects.  Rather than connections,
+supporting multiple operating systems and/or interconnects.  Rather than connections,
 the API uses the notion of communication groups (i.e.  communicators) which include all
 processes ({\sf MPI\_COMM\_WORLD}) and may be split to include subsets of processes. MPI does
 provide a notion of dynamic process management which includes {\sf MPI\_COMM\_ACCEPT} and
@@ -99,7 +98,7 @@ organization-specific APIs available today including OpenFabrics
 Verbs, Cray/Sandia's Portals~\cite{portals}, QLogic's
 PSM, Myricom's MX, LBL's GASNet~\cite{gasnet}, 
 DAPL, IBM's LAPI~\cite{lapi_a_1998}, IBM's 
-DCMF~\cite{Kumar:2008:DCM:1375527.1375544} and so on. 
+DCMF~\cite{Kumar:2008:DCM:1375527.1375544} among others. 
 Overall, they provide a lot of choice but none has appeared as 
 a widely used communication interface. Since most are targeted to 
 specific network technologies, the APIs tend to reflect the design 
@@ -119,7 +118,7 @@ two processes.
 The Portals API provides one-sided semantics (i.e.\ Put/Get) but uses match tags to steer
 messages to the correct buffers. The API is connection-less and leaves it up to the NAL to
 maintain any necessary connection state internally. Portals is mostly used on the large
-Cray systems such as ORNL's Jaguar~\cite{jaguar_cug_2010} and LANL's Cielo.  The
+Cray systems such as ORNL's Jaguar~\cite{jaguar_cug_2010}.  The
 Lustre distributed file system NAL, LNET, was originally based on Portals~\cite{lnet}.
 
 Both designed for efficiently implementing MPI, Myricom's MyrinetExpress (MX) and 
@@ -129,11 +128,11 @@ Both are connection-less in that the target does not have to accept connection r
 in-order matching with out-of-order completion.
 
 LAPI~\cite{lapi_a_1998} and DCMF~\cite{Kumar:2008:DCM:1375527.1375544}
-are both proprietary software stack developed by IBM, using as targets
+are both proprietary software stacks developed by IBM, using as targets
 the RS-series and the BlueGene P/Q machines. While some support
 from the scientific community outside IBM exists, it has failed to
 broaden and remains limited. DCMF supports an
-interface for one-sided and two-sided message semantic, with
+interface for one-sided and two-sided message semantics, with
 contiguous or discontiguous memory layout, providing transparent support 
 for link aggregation. The DCMF communication layer supports 
 multiple programming paradigms such as Aggregate Remote Memory Copy Interface 
@@ -143,6 +142,6 @@ communications in an optimized way.
 
 Among all of these interfaces, the OpenFabrics Verbs API has the broadest adoption in HPC, 
 representing 43\% of the machines in the Top 500~\cite{top500}. Despite 
-a limited success in the enterprise world, Verbs aspires to widen its audience 
+limited success in the enterprise world, Verbs aspires to widen its audience 
 beyond HPC, especially over Ethernet through RoCEE~\cite{RoCEE}. As such, we 
 will refer to Verbs alongside Sockets and MPI in the rest of this paper.

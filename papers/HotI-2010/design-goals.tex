@@ -73,7 +73,7 @@ A communication interface should aspire to find the right balance
 between richness of semantics and ease of use.
 
 \subsection{Performance}
-Performance is major drive for innovation in networking, from HPC to 
+Performance is a major driver for innovation in networking, from HPC to 
 Cloud Computing. All modern network technologies leverage common techniques 
 developed in the last two decades: OS-bypass, zero-copy, one-sided and asynchronous operations.
 
@@ -83,7 +83,7 @@ operating system.
 This technique is essential for low latency as it removes the need for 
 interrupts in the critical path. Furthermore, a process or a thread blocking 
 in the kernel is often scheduled on a different core when awakened. Avoiding the 
-operating system can greatly improves NUMA locality. 
+operating system can greatly improve NUMA locality. 
 To support OS-bypass the network adapter must be able to demultiplex incoming 
 packets into corresponding queues in each application. Most of this 
 functionality is commonly used in Ethernet adapters that support Receive Side 
@@ -96,7 +96,7 @@ data directly into the memory space of the application via Direct Memory Access
 that the network adapter can safely access it. 
 An important drawback of zero-copy is its synchronous nature. Since there is 
 no intermediate copies, the memory on the send side cannot be reused until 
-the data has safely been delivered on the receive side (or at least put on 
+the data has been delivered to the receiver (or at least put on 
 the wire for unreliable connections).
 
 Zero-copy is often confused with \emph{one-sided operations}, which allow a 

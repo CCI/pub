@@ -9,7 +9,7 @@ ubiquitous networking.  The Transmission Control Protocol
 developers from many network-specific issues such as reliable delivery
 and message ordering.  Even though TCP/IP was implemented in a wide
 variety of compute and networking hardware, developers still needed a
-common API to create portable software.
+common application programming interface (API) to create portable software.
 %
 The BSD Sockets API filled that role, and became the {\em de facto}
 networking API for most platforms.  
@@ -40,7 +40,7 @@ As a direct result, several next-generation network APIs have evolved,
 such as the Virtual Interface Architecture (VIA), OpenFabrics Verbs,
 Myrinet Express (MX), and the Portals API -- just to name a few.
 %
-While these interface adequately expose the underlying network's
+While these interfaces adequately expose the underlying network's
 capabilities, none of them have garnered the support from application
 developers that the Sockets interface has.
 %
@@ -99,8 +99,7 @@ messaging APIs, followed by a section describing our designs goals.
 In Section~\ref{sec:interface}, we detail the CCI abstraction entities
 (e.g., {\em endpoints} and {\em connections}) as well as the API.
 %
-Finally, we present our current implementation performance over UDP
-and Portals low level interfaces, and then conclude the paper.
+Finally, we present our current implementation performance over UDP, Portals, and MX interfaces, and then conclude the paper.
 
 
 
