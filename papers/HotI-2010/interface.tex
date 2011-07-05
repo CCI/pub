@@ -19,7 +19,7 @@ Endpoints interact with the application through \emph{events}. CCI provides the 
 
 Event-driven designs are common in reactive environments such as Graphical User  Interfaces (GUIs). As such, they are well suited for communication interfaces. In CCI, events may represent receive notifications, send completions, connection transitions, etc. In addition, events may contain resources such as receive buffers. The ownership of these resources is transfered to the application when an event is retrieved, with the expectation that they would be returned to the CCI library at some point through a call to $cci\_return\_event()$, possibly out of order. Such a mechanism can be leveraged by advanced users to delay processing of a particular event. A simple example of a event processing loop is shown in code listing~\ref{lst:event-loop}.
 
-\lstset{language=C, frame=single, basicstyle=\ttfamily\small}
+\lstset{language=C, frame=single, captionpos=b, abovecaptionskip=\smallskipamount, basicstyle=\ttfamily\small}
 \begin{lstlisting} [caption=CCI event processing loop, label=lst:event-loop,float]
   rc = cci_get_event(endpoint, &event);
   if (rc == CCI_SUCCESS) {
@@ -105,7 +105,6 @@ services, the URI could be a standard URL. The flexibility of the URI allows
 for extensibility of naming and support of additional functionality, such as 
 system-wide load-balancing and fail-over. The pseudo-code listing~\ref{lst:conn-est} shows a connection establishment between a client and a server, in complement of the event processing loop described previously.
 
-\lstset{language=C, frame=single, basicstyle=\ttfamily\small}
 \begin{lstlisting}[label=lst:conn-est,caption=CCI connection establishment example]
   port = 1234;
   if (server) {
@@ -166,7 +165,6 @@ On the send side, messages are immediately buffered.
 
 A single function $cci\_send()$ is used to send messages, its prototype is presented in code listing~\ref{lst:cci-send}. Two segments are supported by default to simplify data encapsulation behind an application header. The context is returned as part of a send completion event, if requested.
 
-\lstset{language=C, frame=single, basicstyle=\ttfamily\small}
 \begin{lstlisting}[label=lst:cci-send,caption=CCI send prototype]
 int 
 cci_send(cci_connection_t *connection, 
@@ -240,7 +238,6 @@ cost is borne only when needed. An implementation of the SHMEM~\cite{openshmem} 
 
 Memory registration and RMA prototypes are presented in code listing~\ref{lst:rma}. Memory registration produces a memory handle than can be sent to the target side of a subsequent RMA operation. The RMA call itself requires both a local and remote memory handle. In addition, it allows to optionally piggyback an header segment as an active message. This message is ordered relative to the delivery of the RMA data, the corresponding receive event can be used to notify completion of the RMA on the target. This mechanism is similar to the small \emph{immediate} data in Verbs.
 
-\lstset{language=C, frame=single, basicstyle=\ttfamily\small}
 \begin{lstlisting}[label=lst:rma, caption=CCI RMA prototypes]
 int 
 cci_rma_register(cci_endpoint_t *endpoint,
