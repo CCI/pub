@@ -31,7 +31,7 @@ MX's synchronous (rendezvous) send.
 We wrote ping pong applications for Portals, MX, and CCI.  We tested CCI in lock-less
 and locking versions, \emph{CCI} and \emph{CCI Thread-Safe} respectively, for active
 message ping pong tests. All binaries were compiled with \texttt{-O3} and
-\texttt{-fno-builtin}. Each message size is an average of 512K iterations. Typically,
+\texttt{-fno-builtin}. For each message size we conducted an average of 500,000 iterations. Typically,
 we saw $\pm$10ns variation for messages up to 1 KB.
 
 We evaluated two different native Portals strategies for sending. The first strategy
@@ -50,7 +50,7 @@ performance up to 1 KB.  For an eight byte message, for example, CCI's latency i
 XT6. Figure \ref{fig:latency-rma} shows latency and overhead for RMA messages up to 4
 MB.
 
-For MX tests, we used a pair of machines with dual Intel Nehalems and Myri-10G NICs.
+For MX tests, we used a pair of nodes with dual Intel Nehalems and Myri-10G NICs.
 Figure \ref{fig:latency-mx} shows CCI overhead of around 60ns without locks and
 around 120ns with locks while figure \ref{fig:bw-mx} shows bandwidth for MX, CCI, and
 MPI.
@@ -102,7 +102,7 @@ CCI uses connection-oriented semantics with minimal per-connection resources.
 For the Portals driver, each connection requires 104 bytes on 64-bit machines
 (20 bytes for the public CCI connection struct, 20 bytes for the private CCI
 struct, and 64 bytes for the Portals driver connection struct).  The sock driver
-needs 140 bytes for each connection.
+requires 140 bytes for each connection.
 
 Figure \ref{fig:memory} illustrates the connection state for
 Verbs, BSD Sockets, and CCI. Verbs memory usage scales
