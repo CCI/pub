@@ -19,7 +19,7 @@ Endpoints interact with the application through \emph{events}. CCI provides the 
 
 Event-driven designs are common in reactive environments such as Graphical User  Interfaces (GUIs). As such, they are well suited for communication interfaces. In CCI, events may represent receive notifications, send completions, connection transitions, etc. In addition, events may contain resources such as receive buffers. The ownership of these resources is transfered to the application when an event is retrieved, with the expectation that they would be returned to the CCI library at some point through a call to $cci\_return\_event()$, possibly out of order. Such a mechanism can be leveraged by advanced users to delay processing of a particular event. A simple example of a event processing loop is shown in code listing~\ref{lst:event-loop}.
 
-\lstset{language=C, frame=single, captionpos=b, abovecaptionskip=\smallskipamount, basicstyle=\ttfamily\small}
+\lstset{language=C, frame=single, captionpos=b, basicstyle=\ttfamily\footnotesize}
 \begin{lstlisting} [caption=CCI event processing loop, label=lst:event-loop,float]
   rc = cci_get_event(endpoint, &event);
   if (rc == CCI_SUCCESS) {
