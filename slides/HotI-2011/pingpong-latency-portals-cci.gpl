@@ -1,0 +1,78 @@
+set terminal postscript eps enhanced color
+
+set output "pingpong-latency-portals-cci.eps"
+
+set title "Pingpong Latency (1/2 RTT) on Portals/SeaStar"
+
+set style data lines
+
+set ylabel "Time [{/Symbol m}s]"
+
+set xlabel "Message Size (bytes)"
+
+
+set style line 1 lt 3 lw 4
+set style line 2 lt 1 lw 4
+set style line 3 lt 5 lw 4
+set style line 4 lt 2 lw 4
+set style line 5 lt 4 lw 4
+set style line 6 lt 6 lw 4
+set style line 7 lt -1 lw 4
+set style line 8 lt 7 lw 4
+
+#set key graph 0.4, 0.9
+set key right bottom
+
+set logscale x 2
+set xtics (1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096)
+
+# finally the plot command
+plot [1:4096][0:] "-" with linespoints title "Portals Copy" ls 1, "-" with linespoints title "Portals Bind" ls 2, "-" with linespoints title "CCI/Portals" ls 3
+#  0	    5.50
+   1	    5.56
+   2	    5.56
+   4	    5.56
+   8	    5.56
+  16	    5.55
+  32	   10.08
+  64	   10.06
+ 128	   10.07
+ 256	   10.09
+ 512	   10.17
+1024	   10.27
+2048	   10.89
+4096	   11.83
+8192	   13.62
+e
+#  0	    5.73
+   1	    5.82
+   2	    5.83
+   4	    5.83
+   8	    5.83
+  16	    5.84
+  32	   10.34
+  64	   10.34
+ 128	   10.34
+ 256	   10.34
+ 512	   10.35
+1024	   10.36
+2048	   11.00
+4096	   11.65
+8192	   12.97
+e
+#  0	  5.55
+   1	  5.75
+   2	  5.78
+   4	  5.80
+   8	  5.80
+  16	  5.85
+  32	 10.37
+  64	 10.38
+ 128	 10.37
+ 256	 10.39
+ 512	 10.42
+1024	 10.45
+2048	 10.84
+4096	 11.58
+8192	 13.76
+e
