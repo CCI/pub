@@ -25,9 +25,12 @@ set key right bottom
 
 set logscale x 2
 set xtics (1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096)
+set ytics (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
+
+set grid ytics lw 0.3 lt -1
 
 # finally the plot command
-plot [1:4096][0:] "-" with linespoints title "Portals Copy" ls 1, "-" with linespoints title "Portals Bind" ls 2, "-" with linespoints title "CCI/Portals" ls 3, "-" with linespoints title "Native CCI/SeaStar" ls 4
+plot [1:4096][0:12] "-" with linespoints title "Portals Copy" ls 1, "-" with linespoints title "Portals Bind" ls 2, "-" with linespoints title "CCI/Portals" ls 3, "-" with linespoints title "Native CCI/SeaStar" ls 4
 #  0	    5.50
    1	    5.56
    2	    5.56
