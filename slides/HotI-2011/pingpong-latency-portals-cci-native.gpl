@@ -2,7 +2,7 @@ set terminal postscript eps enhanced color
 
 set output "pingpong-latency-portals-cci-native.eps"
 
-set title "Pingpong Latency (1/2 RTT) on Portals/SeaStar"
+set title "Pingpong Latency (1/2 RTT) on SeaStar"
 
 set style data lines
 
